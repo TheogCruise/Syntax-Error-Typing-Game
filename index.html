@@ -151,8 +151,42 @@
     z-index: 10;
     pointer-events: none;
     min-height: 30px;
+    min-width: 300px;
     text-align: center;
+    white-space: nowrap;
   }
+
+  /* Blinking cursor */
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 22px;
+    background: var(--neon-yellow);
+    box-shadow: 0 0 8px var(--neon-yellow);
+    vertical-align: middle;
+    margin-left: 3px;
+    animation: blink 0.8s step-end infinite;
+  }
+
+  /* Miss flash overlay */
+  #missAlert {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 20px var(--neon-pink);
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+  #missAlert.visible { opacity: 1; }
 
   /* OVERLAY SCREENS */
   .overlay {
@@ -260,25 +294,7 @@
   .final-stat .stat-label { font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 3px; color: rgba(0,245,255,0.5); margin-bottom: 6px; }
   .final-stat .stat-value { font-family: 'Orbitron', monospace; font-size: 32px; font-weight: 900; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
 
-  /* Jam indicator */
-  #jamAlert {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Orbitron', monospace;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 6px;
-    color: var(--neon-pink);
-    text-shadow: 0 0 20px var(--neon-pink);
-    z-index: 20;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.1s;
-  }
-
-  #jamAlert.visible { opacity: 1; }
+  .diff-btn.active { box-shadow: inset 0 0 10px rgba(0,245,255,0.1); }
 
   .difficulty-selector {
     display: flex;
@@ -294,7 +310,7 @@
     background: transparent;
     border: 1px solid rgba(0,245,255,0.3);
     color: rgba(0,245,255,0.5);
-    cursor: pointer;
+    cursor: none;
     transition: all 0.2s;
     clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
   }
@@ -306,7 +322,101 @@
     text-shadow: 0 0 8px var(--neon-cyan);
   }
 
-  .diff-btn.active { box-shadow: inset 0 0 10px rgba(0,245,255,0.1); }
+  /* ── KEYBOARD FOCUS STYLES ── */
+  .cyber-btn { cursor: none; }
+
+  .nav-btn {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: rgba(0,245,255,0.45);
+    background: transparent;
+    border: 1px solid rgba(0,245,255,0.2);
+    padding: 16px 48px;
+    cursor: none;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: all 0.2s;
+    text-transform: uppercase;
+    position: relative;
+    display: block;
+    width: 260px;
+    text-align: center;
+    margin: 6px auto;
+  }
+
+  .nav-btn::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--neon-cyan);
+    border-top: 2px solid var(--neon-cyan);
+    transform: translateY(-50%) rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .nav-btn.kb-focus {
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    background: rgba(0,245,255,0.08);
+    box-shadow: 0 0 18px rgba(0,245,255,0.25), inset 0 0 10px rgba(0,245,255,0.05);
+    text-shadow: 0 0 10px var(--neon-cyan);
+  }
+
+  .nav-btn.kb-focus::before { opacity: 1; }
+
+  .nav-btn.danger.kb-focus {
+    color: var(--neon-pink);
+    border-color: var(--neon-pink);
+    background: rgba(255,0,110,0.08);
+    box-shadow: 0 0 18px rgba(255,0,110,0.25), inset 0 0 10px rgba(255,0,110,0.05);
+    text-shadow: 0 0 10px var(--neon-pink);
+  }
+
+  .nav-btn.danger.kb-focus::before { border-color: var(--neon-pink); }
+
+  /* ── PAUSE SCREEN ── */
+  #pauseScreen {
+    background: rgba(2,4,8,0.82);
+    backdrop-filter: blur(3px);
+  }
+
+  #pauseScreen .glitch-title {
+    font-size: clamp(28px, 5vw, 56px);
+    color: var(--neon-yellow);
+    text-shadow: 0 0 20px var(--neon-yellow), 0 0 60px var(--neon-yellow);
+    animation: glitch-yellow 4s infinite;
+  }
+
+  @keyframes glitch-yellow {
+    0%, 88%, 100% { text-shadow: 0 0 20px var(--neon-yellow), 0 0 60px var(--neon-yellow); transform: none; }
+    89% { text-shadow: -3px 0 var(--neon-pink), 3px 0 var(--neon-cyan); transform: translateX(2px); }
+    90% { text-shadow: 3px 0 var(--neon-pink), -3px 0 var(--neon-cyan); transform: translateX(-2px); }
+    91% { text-shadow: 0 0 20px var(--neon-yellow), 0 0 60px var(--neon-yellow); transform: none; }
+  }
+
+  .pause-hint {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: rgba(0,245,255,0.75);
+    text-shadow: 0 0 6px rgba(0,245,255,0.3);
+    margin-top: 30px;
+  }
+
+  .btn-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  button:focus { outline: none; }
 </style>
 </head>
 <body>
@@ -329,8 +439,8 @@
   </div>
 </div>
 
-<div id="typeDisplay"></div>
-<div id="jamAlert">⚡ JAMMED ⚡</div>
+<div id="typeDisplay"><span class="cursor"></span></div>
+<div id="missAlert">✖ NO MATCH ✖</div>
 
 <div id="healthBar">
   <div id="healthLabel">SHIELD INTEGRITY</div>
@@ -340,11 +450,10 @@
 <!-- Start Screen -->
 <div class="overlay" id="startScreen">
   <div class="glitch-title">BULLET-TIME<br>TYPIST</div>
-  <div class="sub-title">// CYBERPUNK TYPING SURVIVAL //</div>
   <div class="instructions">
-    Type the words above enemies to destroy them<br>
-    First letter <span style="color:var(--neon-cyan)">LOCKS</span> onto target<br>
-    Typos <span style="color:var(--neon-pink)">JAM</span> your keyboard for 500ms<br>
+    Type any enemy's word and press <span style="color:var(--neon-cyan)">ENTER</span> to destroy it<br>
+    <span style="color:var(--neon-green)">BACKSPACE</span> to correct mistakes<br>
+    Matching prefix highlights the target enemy<br>
     Don't let them reach your <span style="color:var(--neon-yellow)">CORE</span>
   </div>
   <div class="difficulty-selector">
@@ -352,7 +461,21 @@
     <button class="diff-btn" data-diff="normal">NORMAL</button>
     <button class="diff-btn" data-diff="hard">HARD</button>
   </div>
-  <button class="cyber-btn" id="startBtn">INITIALIZE</button>
+  <div class="btn-row">
+    <button class="nav-btn" id="startBtn">INITIALIZE</button>
+  </div>
+  <div class="pause-hint" style="margin-top:18px;">↑ ↓ NAVIGATE &nbsp;·&nbsp; ENTER SELECT &nbsp;·&nbsp; ESC PAUSE</div>
+</div>
+
+<!-- Pause Screen -->
+<div class="overlay hidden" id="pauseScreen">
+  <div class="glitch-title">PAUSED</div>
+  <div class="sub-title">// SYSTEM SUSPENDED //</div>
+  <div class="btn-row">
+    <button class="nav-btn" id="resumeBtn">RESUME</button>
+    <button class="nav-btn danger" id="pauseMenuBtn">MAIN MENU</button>
+  </div>
+  <div class="pause-hint">↑ ↓ NAVIGATE &nbsp;·&nbsp; ENTER SELECT &nbsp;·&nbsp; ESC RESUME</div>
 </div>
 
 <!-- Game Over Screen -->
@@ -377,7 +500,11 @@
       <div class="stat-value" id="finalCombo">0</div>
     </div>
   </div>
-  <button class="cyber-btn" id="restartBtn">REBOOT</button>
+  <div class="btn-row">
+    <button class="nav-btn" id="restartBtn">REBOOT</button>
+    <button class="nav-btn danger" id="menuBtn">MAIN MENU</button>
+  </div>
+  <div class="pause-hint">↑ ↓ NAVIGATE &nbsp;·&nbsp; ENTER SELECT</div>
 </div>
 
 <script>
@@ -418,7 +545,7 @@ let lastTime = 0;
 let particles = [];
 let floatingTexts = [];
 let gridOffset = 0;
-let wpmBuffer = [];
+let wpmWordTimes = []; // timestamps of each destroyed word
 let peakWpm = 0;
 let peakCombo = 0;
 
@@ -428,8 +555,8 @@ const wpmVal      = document.getElementById('wpmVal');
 const comboVal    = document.getElementById('comboVal');
 const typeDisplay = document.getElementById('typeDisplay');
 const healthFill  = document.getElementById('healthFill');
-const jamAlert    = document.getElementById('jamAlert');
 const startScreen = document.getElementById('startScreen');
+const pauseScreen = document.getElementById('pauseScreen');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const finalScore  = document.getElementById('finalScore');
 const finalWords  = document.getElementById('finalWords');
@@ -471,20 +598,19 @@ function spawnEdgePos() {
 function initState() {
   state = {
     playing: false,
+    paused: false,
     player: { x: canvas.width / 2, y: canvas.height / 2, r: 22, hp: 100 },
     enemies: [],
-    targetId: null,
-    typedProgress: 0,
+    currentInput: '',
     score: 0,
     combo: 1,
     wordsTyped: 0,
-    jammed: false,
-    jamEnd: 0,
-    currentInput: '',
+    missFlash: false,
+    missEnd: 0,
   };
   particles = [];
   floatingTexts = [];
-  wpmBuffer = [];
+  wpmWordTimes = [];
   peakWpm = 0;
   peakCombo = 0;
   spawnTimer = 0;
@@ -652,16 +778,27 @@ function drawEnemies() {
   const t = Date.now() / 1000;
 
   state.enemies.forEach(e => {
-    const isTarget = e.id === state.targetId;
     const pulse = 0.7 + 0.3 * Math.sin(t * 3 + e.pulse);
-    const glowIntensity = isTarget ? 30 : 12;
+
+    // Check if current input is a prefix of this enemy's word
+    const inp = state.currentInput.toLowerCase();
+    let matchLen = 0;
+    if (inp.length > 0) {
+      for (let i = 0; i < Math.min(inp.length, e.word.length); i++) {
+        if (e.word[i] === inp[i]) matchLen++;
+        else break;
+      }
+    }
+    const isHighlighted = matchLen > 0 && matchLen === inp.length;
+
+    const glowIntensity = isHighlighted ? 30 : 12;
 
     // Shadow/glow
     ctx.save();
     ctx.shadowColor = e.color.stroke;
     ctx.shadowBlur = glowIntensity * pulse;
     ctx.strokeStyle = e.color.stroke;
-    ctx.lineWidth = isTarget ? 2.5 : 1.5;
+    ctx.lineWidth = isHighlighted ? 2.5 : 1.5;
     ctx.fillStyle = e.color.glow;
 
     drawShape(e.x, e.y, e.size, e.shape, e.rot);
@@ -669,56 +806,36 @@ function drawEnemies() {
     ctx.stroke();
     ctx.restore();
 
-    // Inner fill glow for target
-    if (isTarget) {
+    // Inner fill glow for highlighted
+    if (isHighlighted) {
       ctx.save();
       ctx.globalAlpha = 0.15 * pulse;
       ctx.fillStyle = e.color.stroke;
       drawShape(e.x, e.y, e.size, e.shape, e.rot);
       ctx.fill();
       ctx.restore();
-
-      // Target lock bracket
-      ctx.save();
-      ctx.strokeStyle = '#ffff00';
-      ctx.lineWidth = 1.5;
-      ctx.shadowColor = '#ffff00';
-      ctx.shadowBlur = 10;
-      const bs = e.size + 10;
-      const corner = 8;
-      // TL
-      ctx.beginPath(); ctx.moveTo(e.x-bs, e.y-bs+corner); ctx.lineTo(e.x-bs, e.y-bs); ctx.lineTo(e.x-bs+corner, e.y-bs); ctx.stroke();
-      // TR
-      ctx.beginPath(); ctx.moveTo(e.x+bs-corner, e.y-bs); ctx.lineTo(e.x+bs, e.y-bs); ctx.lineTo(e.x+bs, e.y-bs+corner); ctx.stroke();
-      // BL
-      ctx.beginPath(); ctx.moveTo(e.x-bs, e.y+bs-corner); ctx.lineTo(e.x-bs, e.y+bs); ctx.lineTo(e.x-bs+corner, e.y+bs); ctx.stroke();
-      // BR
-      ctx.beginPath(); ctx.moveTo(e.x+bs-corner, e.y+bs); ctx.lineTo(e.x+bs, e.y+bs); ctx.lineTo(e.x+bs, e.y+bs-corner); ctx.stroke();
-      ctx.restore();
     }
 
     // Word label
     drawWordLabel(e);
-
-    // Threat line if targeting
-    if (isTarget) {
-      ctx.save();
-      ctx.strokeStyle = 'rgba(255,255,0,0.12)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 8]);
-      ctx.beginPath();
-      ctx.moveTo(state.player.x, state.player.y);
-      ctx.lineTo(e.x, e.y);
-      ctx.stroke();
-      ctx.restore();
-    }
   });
 }
 
 function drawWordLabel(e) {
-  const isTarget = e.id === state.targetId;
   const word = e.word;
-  const progress = isTarget ? state.typedProgress : 0;
+  const input = state.currentInput.toLowerCase();
+
+  // How many leading chars of this word match the current input
+  let matchLen = 0;
+  if (input.length > 0) {
+    for (let i = 0; i < Math.min(input.length, word.length); i++) {
+      if (word[i] === input[i]) matchLen++;
+      else break;
+    }
+  }
+
+  const isFullMatch = input === word;
+  const isPrefix = matchLen > 0 && matchLen === input.length;
 
   ctx.save();
   ctx.font = `bold 13px 'Share Tech Mono', monospace`;
@@ -731,19 +848,19 @@ function drawWordLabel(e) {
 
   // Background
   ctx.fillStyle = 'rgba(2,4,8,0.85)';
-  ctx.strokeStyle = isTarget ? '#ffff00' : e.color.stroke;
-  ctx.lineWidth = 1;
-  ctx.shadowColor = isTarget ? '#ffff00' : e.color.stroke;
-  ctx.shadowBlur = isTarget ? 8 : 4;
+  ctx.strokeStyle = isPrefix ? '#ffff00' : e.color.stroke;
+  ctx.lineWidth = isPrefix ? 1.5 : 1;
+  ctx.shadowColor = isPrefix ? '#ffff00' : e.color.stroke;
+  ctx.shadowBlur = isPrefix ? 10 : 4;
   ctx.fillRect(bx, by, bw, bh);
   ctx.strokeRect(bx, by, bw, bh);
 
-  // Typed portion
-  if (progress > 0) {
-    const typedText = word.slice(0, progress);
-    const typedW = ctx.measureText(typedText).width;
-    ctx.fillStyle = 'rgba(57,255,20,0.2)';
-    ctx.fillRect(bx, by, typedW + padding, bh);
+  // Matched prefix green fill
+  if (matchLen > 0) {
+    const matchText = word.slice(0, matchLen);
+    const matchW = ctx.measureText(matchText).width;
+    ctx.fillStyle = 'rgba(57,255,20,0.18)';
+    ctx.fillRect(bx, by, matchW + padding, bh);
   }
 
   // Letters
@@ -751,12 +868,12 @@ function drawWordLabel(e) {
   const ty = by + bh / 2 + 5;
 
   for (let i = 0; i < word.length; i++) {
-    if (isTarget && i < progress) {
+    if (i < matchLen) {
       ctx.fillStyle = '#39ff14';
       ctx.shadowColor = '#39ff14';
       ctx.shadowBlur = 8;
     } else {
-      ctx.fillStyle = isTarget ? '#ffff00' : e.color.stroke;
+      ctx.fillStyle = isPrefix ? '#ffff00' : e.color.stroke;
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
     }
@@ -795,14 +912,13 @@ function drawFloatingTexts() {
 
 // ─── UPDATE ────────────────────────────────────────────────────────────────────
 function update(dt) {
-  if (!state.playing) return;
+  if (!state.playing || state.paused) return;
 
   // Spawn
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
     spawnEnemy();
     spawnTimer = DIFFICULTIES[difficulty].spawnInterval;
-    // Gradually accelerate
     spawnTimer = Math.max(800, spawnTimer - state.score * 0.3);
   }
 
@@ -812,17 +928,17 @@ function update(dt) {
     e.y += e.vy;
     e.rot += e.rotSpeed;
 
-    // Collision
     const dist = Math.hypot(e.x - state.player.x, e.y - state.player.y);
     if (dist < state.player.r + e.size * 0.7) {
       onPlayerHit(e);
     }
   });
 
-  // Jam
-  if (state.jammed && Date.now() > state.jamEnd) {
-    state.jammed = false;
-    jamAlert.classList.remove('visible');
+  // Miss flash
+  const missAlert = document.getElementById('missAlert');
+  if (state.missFlash && Date.now() > state.missEnd) {
+    state.missFlash = false;
+    missAlert.classList.remove('visible');
   }
 
   // Particles
@@ -839,10 +955,10 @@ function update(dt) {
   });
   floatingTexts = floatingTexts.filter(ft => ft.life > 0);
 
-  // WPM calculation
+  // WPM — words destroyed in the last 30 seconds × (60/30)
   const now = Date.now();
-  wpmBuffer = wpmBuffer.filter(t => now - t < 60000);
-  const wpm = Math.round(wpmBuffer.length * 12); // chars/min / 5
+  wpmWordTimes = wpmWordTimes.filter(t => now - t < 30000);
+  const wpm = Math.round(wpmWordTimes.length * 2); // words per 30s → per minute
   if (wpm > peakWpm) peakWpm = wpm;
   wpmVal.textContent = wpm;
 
@@ -852,40 +968,26 @@ function update(dt) {
   healthFill.style.width = state.player.hp + '%';
   if (state.player.hp <= 0) endGame();
 
-  // Type display
-  if (state.targetId !== null) {
-    const target = state.enemies.find(e => e.id === state.targetId);
-    if (target) {
-      const typed = target.word.slice(0, state.typedProgress);
-      const rest  = target.word.slice(state.typedProgress);
-      typeDisplay.innerHTML = `<span style="color:#39ff14;text-shadow:0 0 8px #39ff14">${typed}</span><span style="color:rgba(255,255,255,0.4)">${rest}</span>`;
-    }
-  } else {
-    typeDisplay.textContent = '';
-  }
+  // Type display — show current input with blinking cursor
+  const inp = state.currentInput;
+  typeDisplay.innerHTML = inp.length > 0
+    ? `<span>${inp}</span><span class="cursor"></span>`
+    : `<span class="cursor"></span>`;
 }
 
 function onPlayerHit(enemy) {
   state.player.hp -= 25;
   spawnParticles(state.player.x, state.player.y, '#ff006e', 20);
   spawnFloatingText(state.player.x, state.player.y - 30, '-25 HP', '#ff006e');
-  // Remove enemy and clear target
   state.enemies = state.enemies.filter(e => e.id !== enemy.id);
-  if (state.targetId === enemy.id) {
-    state.targetId = null;
-    state.typedProgress = 0;
-  }
   state.combo = 1;
 }
 
 // ─── RENDER ────────────────────────────────────────────────────────────────────
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Background
   ctx.fillStyle = '#020408';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   drawGrid();
 
   if (!state.playing) return;
@@ -905,63 +1007,171 @@ function loop(ts) {
   animId = requestAnimationFrame(loop);
 }
 
+// ─── GAME FLOW ─────────────────────────────────────────────────────────────────
+function startGame() {
+  initState();
+  state.playing = true;
+  spawnTimer = 500;
+  startScreen.classList.add('hidden');
+  gameOverScreen.classList.add('hidden');
+  pauseScreen.classList.add('hidden');
+  lastTime = performance.now();
+  if (animId) cancelAnimationFrame(animId);
+  animId = requestAnimationFrame(loop);
+}
+
+function pauseGame() {
+  if (!state.playing || state.paused) return;
+  state.paused = true;
+  state.currentInput = '';
+  pauseScreen.classList.remove('hidden');
+  setMenuFocus('pause', 0);
+}
+
+function resumeGame() {
+  if (!state.paused) return;
+  state.paused = false;
+  pauseScreen.classList.add('hidden');
+  lastTime = performance.now(); // prevent dt spike after pause
+}
+
+function goToMainMenu() {
+  state.playing = false;
+  state.paused = false;
+  if (animId) cancelAnimationFrame(animId);
+  pauseScreen.classList.add('hidden');
+  gameOverScreen.classList.add('hidden');
+  startScreen.classList.remove('hidden');
+  setMenuFocus('start', 0);
+  // restart bg loop
+  animId = requestAnimationFrame(bgLoop);
+}
+
+function endGame() {
+  state.playing = false;
+  state.paused = false;
+  pauseScreen.classList.add('hidden');
+  gameOverScreen.classList.remove('hidden');
+  finalScore.textContent = state.score;
+  finalWords.textContent = state.wordsTyped;
+  finalWpm.textContent = peakWpm;
+  finalCombo.textContent = peakCombo;
+  setMenuFocus('gameover', 0);
+}
+
+// ─── MENU KEYBOARD NAVIGATION ──────────────────────────────────────────────────
+// Groups map: name → ordered array of button IDs
+const MENU_GROUPS = {
+  start:    ['startBtn'],
+  pause:    ['resumeBtn', 'pauseMenuBtn'],
+  gameover: ['restartBtn', 'menuBtn'],
+};
+
+let activeGroup = 'start';
+let focusIndex  = 0;
+
+function setMenuFocus(group, idx) {
+  // Clear previous focus
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('kb-focus'));
+  activeGroup = group;
+  focusIndex  = idx;
+  const ids = MENU_GROUPS[group];
+  if (!ids || ids.length === 0) return;
+  focusIndex = ((idx % ids.length) + ids.length) % ids.length;
+  const el = document.getElementById(ids[focusIndex]);
+  if (el) el.classList.add('kb-focus');
+}
+
+function menuNav(dir) {
+  const ids = MENU_GROUPS[activeGroup];
+  if (!ids) return;
+  setMenuFocus(activeGroup, focusIndex + dir);
+}
+
+function menuSelect() {
+  const ids = MENU_GROUPS[activeGroup];
+  if (!ids) return;
+  const el = document.getElementById(ids[focusIndex]);
+  if (el) el.click();
+}
+
 // ─── INPUT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (!state.playing) return;
   if (e.ctrlKey || e.metaKey || e.altKey) return;
-  if (e.key.length !== 1) return;
-  const ch = e.key.toLowerCase();
-  handleTyping(ch);
-});
 
-function handleTyping(ch) {
-  if (state.jammed) return;
+  // ── MENU / OVERLAY KEYS ──────────────────────────────────────
+  const onOverlay = !state.playing || state.paused;
 
-  // No target → try to lock
-  if (state.targetId === null) {
-    const match = state.enemies.find(e => e.word[0] === ch);
-    if (match) {
-      state.targetId = match.id;
-      state.typedProgress = 1;
-      wpmBuffer.push(Date.now());
-      recordChar(match, 1);
+  if (onOverlay) {
+    e.preventDefault();
+    if (e.key === 'ArrowUp')   { menuNav(-1); return; }
+    if (e.key === 'ArrowDown') { menuNav(1);  return; }
+    if (e.key === 'Enter')     { menuSelect(); return; }
+
+    // On start screen: left/right change difficulty
+    if (!state.playing && !state.paused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      const diffs = ['easy', 'normal', 'hard'];
+      const cur   = diffs.indexOf(difficulty);
+      const next  = (cur + (e.key === 'ArrowRight' ? 1 : -1) + diffs.length) % diffs.length;
+      difficulty  = diffs[next];
+      document.querySelectorAll('.diff-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.diff === difficulty);
+      });
+      return;
     }
+
+    // Escape on pause → resume
+    if (state.paused && e.key === 'Escape') { resumeGame(); return; }
     return;
   }
 
-  // Has target
-  const target = state.enemies.find(e => e.id === state.targetId);
-  if (!target) { state.targetId = null; state.typedProgress = 0; return; }
+  // ── IN-GAME KEYS ─────────────────────────────────────────────
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    pauseGame();
+    return;
+  }
 
-  const expected = target.word[state.typedProgress];
-  if (ch === expected) {
-    state.typedProgress++;
-    wpmBuffer.push(Date.now());
-    recordChar(target, state.typedProgress);
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    state.currentInput = state.currentInput.slice(0, -1);
+    return;
+  }
 
-    if (state.typedProgress >= target.word.length) {
-      destroyEnemy(target);
-    }
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    submitWord();
+    return;
+  }
+
+  if (e.key.length === 1) {
+    state.currentInput += e.key.toLowerCase();
+  }
+});
+
+function submitWord() {
+  const typed = state.currentInput.trim().toLowerCase();
+  state.currentInput = '';
+  if (!typed) return;
+  const match = state.enemies.find(e => e.word === typed);
+  if (match) {
+    destroyEnemy(match);
   } else {
-    // TYPO → JAM
-    triggerJam();
+    triggerMiss();
   }
 }
 
-function recordChar(enemy, progress) {
-  // Visual flash on the canvas
-}
-
-function triggerJam() {
-  state.jammed = true;
-  state.jamEnd = Date.now() + 500;
-  state.typedProgress = 0;
+function triggerMiss() {
+  state.missFlash = true;
+  state.missEnd = Date.now() + 500;
   state.combo = Math.max(1, state.combo - 1);
-  jamAlert.classList.add('visible');
-  spawnFloatingText(state.player.x, state.player.y - 40, 'JAMMED!', '#ff006e');
+  const missAlert = document.getElementById('missAlert');
+  missAlert.classList.add('visible');
+  spawnFloatingText(state.player.x, state.player.y - 40, 'MISS!', '#ff006e');
 }
 
 function destroyEnemy(enemy) {
+  wpmWordTimes.push(Date.now()); // record for WPM
   const points = enemy.word.length * 10 * state.combo;
   state.score += points;
   state.wordsTyped++;
@@ -976,34 +1186,14 @@ function destroyEnemy(enemy) {
   }
 
   state.enemies = state.enemies.filter(e => e.id !== enemy.id);
-  state.targetId = null;
-  state.typedProgress = 0;
 }
 
-// ─── GAME FLOW ─────────────────────────────────────────────────────────────────
-function startGame() {
-  initState();
-  state.playing = true;
-  spawnTimer = 500;
-  startScreen.classList.add('hidden');
-  gameOverScreen.classList.add('hidden');
-  lastTime = performance.now();
-  if (animId) cancelAnimationFrame(animId);
-  animId = requestAnimationFrame(loop);
-}
-
-function endGame() {
-  state.playing = false;
-  gameOverScreen.classList.remove('hidden');
-  finalScore.textContent = state.score;
-  finalWords.textContent = state.wordsTyped;
-  finalWpm.textContent = peakWpm;
-  finalCombo.textContent = peakCombo;
-}
-
-// ─── BUTTON EVENTS ─────────────────────────────────────────────────────────────
+// ─── BUTTON CLICK EVENTS ───────────────────────────────────────────────────────
 document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+document.getElementById('pauseMenuBtn').addEventListener('click', goToMainMenu);
 document.getElementById('restartBtn').addEventListener('click', startGame);
+document.getElementById('menuBtn').addEventListener('click', goToMainMenu);
 
 document.querySelectorAll('.diff-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1013,27 +1203,41 @@ document.querySelectorAll('.diff-btn').forEach(btn => {
   });
 });
 
-// ─── BOOT RENDER ───────────────────────────────────────────────────────────────
+// Hovering a nav-btn with mouse shifts keyboard focus to it
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('mouseenter', () => {
+    // figure out which group this btn belongs to
+    for (const [grp, ids] of Object.entries(MENU_GROUPS)) {
+      const idx = ids.indexOf(btn.id);
+      if (idx !== -1) { setMenuFocus(grp, idx); break; }
+    }
+  });
+});
+
+// ─── BOOT ──────────────────────────────────────────────────────────────────────
+setMenuFocus('start', 0);
+
 (function bootRender() {
   ctx.fillStyle = '#020408';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   drawGrid();
-  requestAnimationFrame(() => {
-    ctx.fillStyle = '#020408';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawGrid();
-  });
 })();
 
-// Continuous background grid animation even on start screen
+// Continuous background grid animation on start/pause screens
 function bgLoop(ts) {
-  if (!state.playing) {
+  if (!state.playing || state.paused) {
     ctx.fillStyle = '#020408';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     gridOffset = (gridOffset + 0.3) % 60;
     drawGrid();
+    // Draw frozen game state behind pause overlay
+    if (state.paused) {
+      drawEnemies();
+      drawPlayer();
+      drawParticles();
+    }
+    if (!state.playing) animId = requestAnimationFrame(bgLoop);
   }
-  if (!state.playing) requestAnimationFrame(bgLoop);
 }
 requestAnimationFrame(bgLoop);
 </script>
