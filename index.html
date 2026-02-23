@@ -198,6 +198,7 @@
     justify-content: center;
     z-index: 50;
     background: rgba(2,4,8,0.9);
+    pointer-events: none; /* mouse fully disabled — keyboard only */
   }
 
   .overlay.hidden { display: none; }
@@ -311,6 +312,7 @@
     border: 1px solid rgba(0,245,255,0.3);
     color: rgba(0,245,255,0.5);
     cursor: none;
+    pointer-events: none;
     transition: all 0.2s;
     clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
   }
@@ -323,7 +325,7 @@
   }
 
   /* ── KEYBOARD FOCUS STYLES ── */
-  .cyber-btn { cursor: none; }
+  .cyber-btn { cursor: none; pointer-events: none; }
 
   .nav-btn {
     font-family: 'Orbitron', monospace;
@@ -335,6 +337,7 @@
     border: 1px solid rgba(0,245,255,0.2);
     padding: 16px 48px;
     cursor: none;
+    pointer-events: none;
     clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
     transition: all 0.2s;
     text-transform: uppercase;
@@ -417,6 +420,143 @@
   }
 
   button:focus { outline: none; }
+
+  /* ── BULLET TIME METER ── */
+  #btMeter {
+    position: absolute;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  #btLabel {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(191,0,255,0.7);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+  }
+
+  #btSegments {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 5px;
+  }
+
+  .bt-seg {
+    width: 22px;
+    height: 32px;
+    border: 1px solid rgba(191,0,255,0.3);
+    background: rgba(191,0,255,0.04);
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    transition: background 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+
+  .bt-seg.filled {
+    background: rgba(191,0,255,0.6);
+    border-color: #bf00ff;
+    box-shadow: 0 0 10px #bf00ff, inset 0 0 8px rgba(191,0,255,0.4);
+  }
+
+  #btReadyLabel {
+    font-family: 'Orbitron', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: #bf00ff;
+    text-shadow: 0 0 8px #bf00ff;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  #btReadyLabel.visible { opacity: 1; animation: bt-pulse 1s ease-in-out infinite; }
+
+  @keyframes bt-pulse {
+    0%, 100% { text-shadow: 0 0 8px #bf00ff; opacity: 1; }
+    50%       { text-shadow: 0 0 20px #bf00ff, 0 0 40px #bf00ff; opacity: 0.7; }
+  }
+
+  /* Bullet Time active screen tint — drawn via canvas, but also a CSS vignette */
+  #btTint {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 8;
+    opacity: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(80,0,180,0.18) 100%);
+    border: 3px solid rgba(191,0,255,0.0);
+    transition: opacity 0.3s;
+  }
+  #btTint.active {
+    opacity: 1;
+    border-color: rgba(191,0,255,0.4);
+    animation: bt-border-pulse 1s ease-in-out infinite;
+  }
+  @keyframes bt-border-pulse {
+    0%,100% { border-color: rgba(191,0,255,0.3); }
+    50%     { border-color: rgba(191,0,255,0.8); box-shadow: inset 0 0 30px rgba(191,0,255,0.15); }
+  }
+
+  #btActiveLabel {
+    position: absolute;
+    top: 80px;
+    right: 70px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #bf00ff;
+    text-shadow: 0 0 12px #bf00ff;
+    pointer-events: none;
+    z-index: 15;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  #btActiveLabel.visible { opacity: 1; }
+
+  /* ── BOSS PRESENCE EFFECTS ── */
+  #bossTint {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 7;
+    opacity: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(180,0,0,0.22) 100%);
+    transition: opacity 0.8s;
+  }
+  #bossTint.active { opacity: 1; }
+
+  #bossWarning {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: #ff4400;
+    text-shadow: 0 0 14px #ff4400, 0 0 30px #ff2200;
+    pointer-events: none;
+    z-index: 15;
+    opacity: 0;
+    transition: opacity 0.4s;
+    animation: boss-warn 0.7s ease-in-out infinite;
+  }
+  #bossWarning.visible { opacity: 1; }
+  @keyframes boss-warn {
+    0%,100% { text-shadow: 0 0 14px #ff4400, 0 0 30px #ff2200; }
+    50%      { text-shadow: 0 0 28px #ff6600, 0 0 60px #ff2200, 0 0 90px #ff0000; }
+  }
 </style>
 </head>
 <body>
@@ -447,13 +587,32 @@
   <div id="healthTrack"><div id="healthFill"></div></div>
 </div>
 
+<!-- Bullet Time Meter -->
+<div id="btMeter">
+  <div id="btReadyLabel">TAB<br>READY</div>
+  <div id="btSegments">
+    <div class="bt-seg" id="bts0"></div>
+    <div class="bt-seg" id="bts1"></div>
+    <div class="bt-seg" id="bts2"></div>
+    <div class="bt-seg" id="bts3"></div>
+    <div class="bt-seg" id="bts4"></div>
+  </div>
+  <div id="btLabel">BULLET TIME</div>
+</div>
+
+<!-- Bullet Time screen effects -->
+<div id="btTint"></div>
+<div id="btActiveLabel">◈ BULLET TIME ◈</div>
+<div id="bossTint"></div>
+<div id="bossWarning">⚠ BOSS INCOMING ⚠</div>
+
 <!-- Start Screen -->
 <div class="overlay" id="startScreen">
   <div class="glitch-title">BULLET-TIME<br>TYPIST</div>
   <div class="instructions">
     Type any enemy's word and press <span style="color:var(--neon-cyan)">ENTER</span> to destroy it<br>
     <span style="color:var(--neon-green)">BACKSPACE</span> to correct mistakes<br>
-    Matching prefix highlights the target enemy<br>
+    Kill enemies to charge <span style="color:#bf00ff">BULLET TIME</span> — press <span style="color:#bf00ff">TAB</span> to activate<br>
     Don't let them reach your <span style="color:var(--neon-yellow)">CORE</span>
   </div>
   <div class="difficulty-selector">
@@ -512,29 +671,59 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-const WORD_BANK = [
+const WORDS_SHORT = [
+  'ax','bug','cpu','dll','dns','dos','exe','ftp','gpu','hex',
+  'lan','log','net','npc','orm','php','ram','rpc','sdk','sql',
+  'ssh','tcp','udp','vpn','xml','zip','bot','bit','ops','key',
+  'api','dev','sys','bin','lib','env','io','rx','tx','null'
+];
+
+const WORDS_MEDIUM = [
   'cyber','pulse','glitch','neon','hack','sync','data','flux','void','core',
-  'grid','node','ping','byte','null','root','exec','kill','fork','boot',
-  'drain','surge','crash','token','proxy','virus','clone','ghost','shift','burst',
-  'trace','nexus','chaos','rift','loop','spawn','drift','blade','echo','zero',
-  'matrix','shadow','cipher','portal','vector','static','neural','binary','chrome','system',
-  'decrypt','override','cascade','protocol','terminal','firewall','synthetic','mainframe','uplink','downlink',
-  'archive','corrupt','latency','payload','exploit','defense','sentinel','phantom','stealth','quantum'
+  'grid','node','ping','byte','root','exec','kill','fork','boot','drain',
+  'surge','crash','token','proxy','virus','clone','ghost','shift','burst','trace',
+  'nexus','chaos','rift','loop','spawn','drift','blade','echo','zero','matrix',
+  'shadow','cipher','portal','vector','static','neural','binary','chrome','system','decode',
+  'uplink','latency','payload','exploit','stealth','quantum','corrupt','archive','phantom','cascade'
+];
+
+const WORDS_BOSS = [
+  'mainframe','synthetic','protocol','terminal','firewall','override','downlink',
+  'sentinel','encrypted','bytecode','datastream','netrunner','cybervault','hyperlink',
+  'darkmatrix','nullpointer','kernelpanic','rootaccess','systembreach','ghostwire',
+  'megacorpnet','neuralspike','virusprotocol','cipherbreak','quantumrift'
 ];
 
 const DIFFICULTIES = {
-  easy:   { spawnInterval: 3500, enemySpeed: 0.35, wordLenMax: 5, maxEnemies: 6 },
-  normal: { spawnInterval: 2500, enemySpeed: 0.6,  wordLenMax: 7, maxEnemies: 9 },
-  hard:   { spawnInterval: 1500, enemySpeed: 0.95, wordLenMax: 12, maxEnemies: 14 }
+  easy:   { spawnInterval: 3500, maxEnemies: 7,  bossEveryNKills: 20 },
+  normal: { spawnInterval: 2400, maxEnemies: 10, bossEveryNKills: 15 },
+  hard:   { spawnInterval: 1400, maxEnemies: 14, bossEveryNKills: 10 }
 };
 
-const SHAPES = ['triangle', 'square', 'hexagon', 'diamond'];
-const ENEMY_COLORS = [
-  { stroke: '#ff006e', glow: 'rgba(255,0,110,0.4)' },
-  { stroke: '#bf00ff', glow: 'rgba(191,0,255,0.4)' },
-  { stroke: '#ff4500', glow: 'rgba(255,69,0,0.4)' },
-  { stroke: '#00f5ff', glow: 'rgba(0,245,255,0.3)' },
-];
+// Tier definitions: speed multipliers and size ranges
+const TIERS = {
+  short:  { speedMult: 1.6, sizeMin: 13, sizeMax: 17, rotMult: 2.0,
+            colors: [
+              { stroke: '#00f5ff', glow: 'rgba(0,245,255,0.3)' },
+              { stroke: '#39ff14', glow: 'rgba(57,255,20,0.3)' },
+            ]},
+  medium: { speedMult: 1.0, sizeMin: 20, sizeMax: 28, rotMult: 1.0,
+            colors: [
+              { stroke: '#ff006e', glow: 'rgba(255,0,110,0.4)' },
+              { stroke: '#bf00ff', glow: 'rgba(191,0,255,0.4)' },
+              { stroke: '#ff4500', glow: 'rgba(255,69,0,0.4)'  },
+            ]},
+  boss:   { speedMult: 0.22, sizeMin: 44, sizeMax: 52, rotMult: 0.3,
+            colors: [
+              { stroke: '#ff6600', glow: 'rgba(255,80,0,0.5)'  },
+            ]},
+};
+
+const BASE_SPEED = 0.7; // pixels/ms at normal timeScale=1
+
+const SHAPES_SHORT  = ['triangle', 'diamond'];
+const SHAPES_MEDIUM = ['square', 'hexagon', 'diamond', 'triangle'];
+const SHAPES_BOSS   = ['star8', 'octagon'];
 
 // ─── STATE ─────────────────────────────────────────────────────────────────────
 let state = {};
@@ -576,16 +765,10 @@ function rand(min, max) { return Math.random() * (max - min) + min; }
 function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
 function randItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-function getWordForDiff() {
-  const cfg = DIFFICULTIES[difficulty];
-  const pool = WORD_BANK.filter(w => w.length <= cfg.wordLenMax);
-  return randItem(pool);
-}
-
 function spawnEdgePos() {
   const side = randInt(0, 3);
   const W = canvas.width, H = canvas.height;
-  const pad = 40;
+  const pad = 60;
   switch(side) {
     case 0: return { x: rand(0, W), y: -pad };
     case 1: return { x: W + pad,   y: rand(0, H) };
@@ -607,6 +790,18 @@ function initState() {
     wordsTyped: 0,
     missFlash: false,
     missEnd: 0,
+    // Bullet Time
+    btCharge: 0,
+    btActive: false,
+    btEnd: 0,
+    btDuration: 8000,
+    btKillsNeeded: 10,
+    btKills: 0,
+    timeScale: 1.0,
+    // Boss
+    totalKills: 0,
+    killsSinceLastBoss: 0,
+    bossAlive: false,
   };
   particles = [];
   floatingTexts = [];
@@ -616,33 +811,73 @@ function initState() {
   spawnTimer = 0;
 }
 
+function pickWordAndTier() {
+  // Boss words are only spawned via spawnBoss
+  // Weighted random: 40% short, 60% medium on easy; more medium on hard
+  const shortChance = difficulty === 'easy' ? 0.55 : difficulty === 'normal' ? 0.40 : 0.30;
+  const r = Math.random();
+  if (r < shortChance) {
+    return { word: randItem(WORDS_SHORT), tier: 'short' };
+  } else {
+    return { word: randItem(WORDS_MEDIUM), tier: 'medium' };
+  }
+}
+
+function buildEnemy(pos, word, tier) {
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  const angle = Math.atan2(cy - pos.y, cx - pos.x);
+  const td = TIERS[tier];
+  const speed = BASE_SPEED * td.speedMult;
+  const color = randItem(td.colors);
+  const shapes = tier === 'boss' ? SHAPES_BOSS : tier === 'short' ? SHAPES_SHORT : SHAPES_MEDIUM;
+  const size = randInt(td.sizeMin, td.sizeMax);
+
+  return {
+    id: enemyIdCounter++,
+    x: pos.x, y: pos.y,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    shape: randItem(shapes),
+    color,
+    word,
+    size,
+    tier,
+    rot: 0,
+    rotSpeed: rand(-0.025, 0.025) * td.rotMult,
+    pulse: rand(0, Math.PI * 2),
+    isBoss: tier === 'boss',
+  };
+}
+
 // ─── ENEMY ─────────────────────────────────────────────────────────────────────
 let enemyIdCounter = 0;
 function spawnEnemy() {
   const cfg = DIFFICULTIES[difficulty];
-  if (state.enemies.length >= cfg.maxEnemies) return;
+  const nonBossCount = state.enemies.filter(e => !e.isBoss).length;
+  if (nonBossCount >= cfg.maxEnemies) return;
 
+  const { word, tier } = pickWordAndTier();
   const pos = spawnEdgePos();
-  const cx = canvas.width / 2, cy = canvas.height / 2;
-  const angle = Math.atan2(cy - pos.y, cx - pos.x);
-  const colorSet = randItem(ENEMY_COLORS);
-  const word = getWordForDiff();
-
-  state.enemies.push({
-    id: enemyIdCounter++,
-    x: pos.x, y: pos.y,
-    vx: Math.cos(angle) * cfg.enemySpeed,
-    vy: Math.sin(angle) * cfg.enemySpeed,
-    shape: randItem(SHAPES),
-    color: colorSet,
-    word,
-    size: randInt(18, 26),
-    rot: 0,
-    rotSpeed: rand(-0.02, 0.02),
-    pulse: rand(0, Math.PI * 2),
-  });
+  state.enemies.push(buildEnemy(pos, word, tier));
 }
 
+function spawnBoss() {
+  if (state.bossAlive) return;
+  const word = randItem(WORDS_BOSS);
+  const pos  = spawnEdgePos();
+  state.bossAlive = true;
+  state.killsSinceLastBoss = 0;
+  state.enemies.push(buildEnemy(pos, word, 'boss'));
+
+  // Dramatic entry effects
+  spawnFloatingText(canvas.width / 2, canvas.height / 2 - 60, '⚠ BOSS ⚠', '#ff4400');
+  document.getElementById('bossTint').classList.add('active');
+  document.getElementById('bossWarning').classList.add('visible');
+  // Hide warning label after 3s
+  setTimeout(() => {
+    document.getElementById('bossWarning').classList.remove('visible');
+  }, 3000);
+}
 // ─── PARTICLES ─────────────────────────────────────────────────────────────────
 function spawnParticles(x, y, color, count = 12) {
   for (let i = 0; i < count; i++) {
@@ -669,8 +904,14 @@ function drawGrid() {
   const W = canvas.width, H = canvas.height;
   gridOffset = (gridOffset + 0.3) % 60;
 
+  // Boss presence: shift grid to blood-red
+  const hasBoss = state.playing && state.bossAlive;
+  const gridColor = hasBoss
+    ? `rgba(255,40,0,${0.045 + 0.02 * Math.sin(Date.now() / 300)})`
+    : 'rgba(0,245,255,0.035)';
+
   ctx.save();
-  ctx.strokeStyle = 'rgba(0,245,255,0.035)';
+  ctx.strokeStyle = gridColor;
   ctx.lineWidth = 1;
 
   for (let x = gridOffset; x < W; x += 60) {
@@ -769,6 +1010,23 @@ function drawShape(x, y, size, shape, rot) {
     ctx.lineTo(0, size * 1.3);
     ctx.lineTo(-size * 0.9, 0);
     ctx.closePath();
+  } else if (shape === 'octagon') {
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 - Math.PI / 8;
+      i === 0 ? ctx.moveTo(Math.cos(a)*size, Math.sin(a)*size)
+              : ctx.lineTo(Math.cos(a)*size, Math.sin(a)*size);
+    }
+    ctx.closePath();
+  } else if (shape === 'star8') {
+    // 8-pointed star: alternate outer/inner radii
+    const inner = size * 0.45;
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2 - Math.PI / 2;
+      const r = i % 2 === 0 ? size : inner;
+      i === 0 ? ctx.moveTo(Math.cos(a)*r, Math.sin(a)*r)
+              : ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+    }
+    ctx.closePath();
   }
 
   ctx.restore();
@@ -780,7 +1038,7 @@ function drawEnemies() {
   state.enemies.forEach(e => {
     const pulse = 0.7 + 0.3 * Math.sin(t * 3 + e.pulse);
 
-    // Check if current input is a prefix of this enemy's word
+    // Prefix match check
     const inp = state.currentInput.toLowerCase();
     let matchLen = 0;
     if (inp.length > 0) {
@@ -791,41 +1049,115 @@ function drawEnemies() {
     }
     const isHighlighted = matchLen > 0 && matchLen === inp.length;
 
-    const glowIntensity = isHighlighted ? 30 : 12;
-
-    // Shadow/glow
-    ctx.save();
-    ctx.shadowColor = e.color.stroke;
-    ctx.shadowBlur = glowIntensity * pulse;
-    ctx.strokeStyle = e.color.stroke;
-    ctx.lineWidth = isHighlighted ? 2.5 : 1.5;
-    ctx.fillStyle = e.color.glow;
-
-    drawShape(e.x, e.y, e.size, e.shape, e.rot);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // Inner fill glow for highlighted
-    if (isHighlighted) {
-      ctx.save();
-      ctx.globalAlpha = 0.15 * pulse;
-      ctx.fillStyle = e.color.stroke;
-      drawShape(e.x, e.y, e.size, e.shape, e.rot);
-      ctx.fill();
-      ctx.restore();
+    if (e.isBoss) {
+      drawBossEnemy(e, t, pulse, isHighlighted);
+    } else {
+      drawNormalEnemy(e, t, pulse, isHighlighted);
     }
 
-    // Word label
     drawWordLabel(e);
   });
 }
 
-function drawWordLabel(e) {
-  const word = e.word;
-  const input = state.currentInput.toLowerCase();
+function drawNormalEnemy(e, t, pulse, isHighlighted) {
+  const glowIntensity = isHighlighted ? 30 : (e.tier === 'short' ? 8 : 14);
 
-  // How many leading chars of this word match the current input
+  ctx.save();
+  ctx.shadowColor = e.color.stroke;
+  ctx.shadowBlur = glowIntensity * pulse;
+  ctx.strokeStyle = e.color.stroke;
+  ctx.lineWidth = isHighlighted ? 2.5 : (e.tier === 'short' ? 1 : 1.5);
+  ctx.fillStyle = e.color.glow;
+  drawShape(e.x, e.y, e.size, e.shape, e.rot);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  if (isHighlighted) {
+    ctx.save();
+    ctx.globalAlpha = 0.15 * pulse;
+    ctx.fillStyle = e.color.stroke;
+    drawShape(e.x, e.y, e.size, e.shape, e.rot);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawBossEnemy(e, t, pulse, isHighlighted) {
+  const bPulse = 0.6 + 0.4 * Math.sin(t * 1.5 + e.pulse);
+  const warnPulse = 0.5 + 0.5 * Math.sin(t * 4);
+
+  // Outer danger ring
+  ctx.save();
+  ctx.strokeStyle = `rgba(255,40,0,${0.18 * bPulse})`;
+  ctx.lineWidth = 2;
+  ctx.shadowColor = '#ff2200';
+  ctx.shadowBlur = 30 * bPulse;
+  ctx.beginPath();
+  ctx.arc(e.x, e.y, e.size + 20 + Math.sin(t * 2) * 4, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Second spinning ring (counter-rotate)
+  ctx.save();
+  ctx.strokeStyle = `rgba(255,100,0,${0.3 * bPulse})`;
+  ctx.lineWidth = 1;
+  ctx.shadowColor = '#ff6600';
+  ctx.shadowBlur = 15;
+  ctx.setLineDash([8, 12]);
+  ctx.beginPath();
+  ctx.arc(e.x, e.y, e.size + 10, -t * 0.8, -t * 0.8 + Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Core body — filled heavily
+  ctx.save();
+  ctx.shadowColor = '#ff4400';
+  ctx.shadowBlur = 40 * bPulse;
+  ctx.strokeStyle = isHighlighted ? '#ffff00' : '#ff6600';
+  ctx.lineWidth = isHighlighted ? 3.5 : 2.5;
+  ctx.fillStyle = `rgba(120,20,0,0.7)`;
+  drawShape(e.x, e.y, e.size, e.shape, e.rot);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // Interior star / second layer (inner shape rotated)
+  ctx.save();
+  ctx.strokeStyle = `rgba(255,180,0,${0.4 * bPulse})`;
+  ctx.lineWidth = 1;
+  ctx.shadowColor = '#ffaa00';
+  ctx.shadowBlur = 12;
+  drawShape(e.x, e.y, e.size * 0.55, e.shape === 'star8' ? 'octagon' : 'star8', -e.rot);
+  ctx.stroke();
+  ctx.restore();
+
+  // Warning chevrons pointing inward (3 rings)
+  if (warnPulse > 0.5) {
+    const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
+    ctx.save();
+    ctx.strokeStyle = `rgba(255,60,0,${(warnPulse - 0.5) * 1.2})`;
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 3; i++) {
+      const dist = e.size + 35 + i * 14;
+      const ax = e.x + Math.cos(angle) * dist;
+      const ay = e.y + Math.sin(angle) * dist;
+      ctx.beginPath();
+      ctx.moveTo(ax + Math.cos(angle + 2.4) * 8, ay + Math.sin(angle + 2.4) * 8);
+      ctx.lineTo(ax, ay);
+      ctx.lineTo(ax + Math.cos(angle - 2.4) * 8, ay + Math.sin(angle - 2.4) * 8);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+function drawWordLabel(e) {
+  const word  = e.word;
+  const input = state.currentInput.toLowerCase();
+  const isBoss = e.isBoss;
+
   let matchLen = 0;
   if (input.length > 0) {
     for (let i = 0; i < Math.min(input.length, word.length); i++) {
@@ -833,39 +1165,51 @@ function drawWordLabel(e) {
       else break;
     }
   }
-
-  const isFullMatch = input === word;
   const isPrefix = matchLen > 0 && matchLen === input.length;
 
   ctx.save();
-  ctx.font = `bold 13px 'Share Tech Mono', monospace`;
-  const padding = 8;
+  const fontSize = isBoss ? 15 : 13;
+  ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
+  const padding = isBoss ? 10 : 8;
   const textW = ctx.measureText(word).width;
   const bw = textW + padding * 2;
-  const bh = 22;
+  const bh = isBoss ? 26 : 22;
   const bx = e.x - bw / 2;
-  const by = e.y - e.size - bh - 10;
+  const by = e.y - e.size - bh - (isBoss ? 16 : 10);
 
   // Background
-  ctx.fillStyle = 'rgba(2,4,8,0.85)';
-  ctx.strokeStyle = isPrefix ? '#ffff00' : e.color.stroke;
-  ctx.lineWidth = isPrefix ? 1.5 : 1;
-  ctx.shadowColor = isPrefix ? '#ffff00' : e.color.stroke;
-  ctx.shadowBlur = isPrefix ? 10 : 4;
+  ctx.fillStyle = isBoss ? 'rgba(40,8,0,0.92)' : 'rgba(2,4,8,0.85)';
+  const baseColor  = isBoss ? '#ff6600' : (isPrefix ? '#ffff00' : e.color.stroke);
+  ctx.strokeStyle  = baseColor;
+  ctx.lineWidth    = isBoss ? 1.5 : (isPrefix ? 1.5 : 1);
+  ctx.shadowColor  = baseColor;
+  ctx.shadowBlur   = isBoss ? 14 : (isPrefix ? 10 : 4);
   ctx.fillRect(bx, by, bw, bh);
   ctx.strokeRect(bx, by, bw, bh);
 
-  // Matched prefix green fill
+  // Boss label tab above the word box
+  if (isBoss) {
+    ctx.font = `bold 9px 'Orbitron', monospace`;
+    const labelW = ctx.measureText('⚠ BOSS ⚠').width + 8;
+    ctx.fillStyle = 'rgba(255,60,0,0.85)';
+    ctx.fillRect(e.x - labelW/2, by - 16, labelW, 14);
+    ctx.fillStyle = '#ffcc00';
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.fillText('⚠ BOSS ⚠', e.x - labelW/2 + 4, by - 5);
+    ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
+  }
+
+  // Matched prefix fill
   if (matchLen > 0) {
-    const matchText = word.slice(0, matchLen);
-    const matchW = ctx.measureText(matchText).width;
+    const matchTextW = ctx.measureText(word.slice(0, matchLen)).width;
     ctx.fillStyle = 'rgba(57,255,20,0.18)';
-    ctx.fillRect(bx, by, matchW + padding, bh);
+    ctx.fillRect(bx, by, matchTextW + padding, bh);
   }
 
   // Letters
   let tx = bx + padding;
-  const ty = by + bh / 2 + 5;
+  const ty = by + bh / 2 + (isBoss ? 6 : 5);
 
   for (let i = 0; i < word.length; i++) {
     if (i < matchLen) {
@@ -873,7 +1217,7 @@ function drawWordLabel(e) {
       ctx.shadowColor = '#39ff14';
       ctx.shadowBlur = 8;
     } else {
-      ctx.fillStyle = isPrefix ? '#ffff00' : e.color.stroke;
+      ctx.fillStyle = isBoss ? '#ff9944' : (isPrefix ? '#ffff00' : e.color.stroke);
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
     }
@@ -914,25 +1258,51 @@ function drawFloatingTexts() {
 function update(dt) {
   if (!state.playing || state.paused) return;
 
-  // Spawn
-  spawnTimer -= dt;
-  if (spawnTimer <= 0) {
-    spawnEnemy();
-    spawnTimer = DIFFICULTIES[difficulty].spawnInterval;
-    spawnTimer = Math.max(800, spawnTimer - state.score * 0.3);
+  // ── Bullet Time drain (uses real wall-clock time, not scaled) ──
+  if (state.btActive) {
+    if (Date.now() > state.btEnd) {
+      deactivateBulletTime();
+    }
   }
 
-  // Update enemies
+  // ── Apply timeScale to spawn timer ──
+  spawnTimer -= dt * state.timeScale;
+  if (spawnTimer <= 0) {
+    spawnEnemy();
+    const base = DIFFICULTIES[difficulty].spawnInterval;
+    spawnTimer = Math.max(800, base - state.score * 0.3);
+  }
+
+  // ── Update enemies (scaled speed) ──
   state.enemies.forEach(e => {
-    e.x += e.vx;
-    e.y += e.vy;
-    e.rot += e.rotSpeed;
+    e.x += e.vx * state.timeScale;
+    e.y += e.vy * state.timeScale;
+    e.rot += e.rotSpeed * state.timeScale;
 
     const dist = Math.hypot(e.x - state.player.x, e.y - state.player.y);
     if (dist < state.player.r + e.size * 0.7) {
-      onPlayerHit(e);
+      if (e.isBoss) {
+        // Boss touch = instant death
+        state.player.hp = 0;
+      } else {
+        onPlayerHit(e);
+      }
     }
   });
+
+  // ── Boss spawn check ──
+  const cfg = DIFFICULTIES[difficulty];
+  if (!state.bossAlive && state.killsSinceLastBoss >= cfg.bossEveryNKills) {
+    spawnBoss();
+  }
+
+  // ── Sync bossTint with boss presence ──
+  const bossTintEl = document.getElementById('bossTint');
+  if (state.bossAlive) {
+    bossTintEl.classList.add('active');
+  } else {
+    bossTintEl.classList.remove('active');
+  }
 
   // Miss flash
   const missAlert = document.getElementById('missAlert');
@@ -941,7 +1311,7 @@ function update(dt) {
     missAlert.classList.remove('visible');
   }
 
-  // Particles
+  // Particles (always full speed — visual only)
   particles.forEach(p => {
     p.x += p.vx; p.y += p.vy;
     p.vx *= 0.94; p.vy *= 0.94;
@@ -955,24 +1325,27 @@ function update(dt) {
   });
   floatingTexts = floatingTexts.filter(ft => ft.life > 0);
 
-  // WPM — words destroyed in the last 30 seconds × (60/30)
+  // WPM — uses real wall-clock timestamps, unaffected by timeScale
   const now = Date.now();
   wpmWordTimes = wpmWordTimes.filter(t => now - t < 30000);
-  const wpm = Math.round(wpmWordTimes.length * 2); // words per 30s → per minute
+  const wpm = Math.round(wpmWordTimes.length * 2);
   if (wpm > peakWpm) peakWpm = wpm;
   wpmVal.textContent = wpm;
 
-  // Update UI
+  // Update HUD
   scoreVal.textContent = state.score;
   comboVal.textContent = `x${state.combo}`;
   healthFill.style.width = state.player.hp + '%';
   if (state.player.hp <= 0) endGame();
 
-  // Type display — show current input with blinking cursor
+  // Type display
   const inp = state.currentInput;
   typeDisplay.innerHTML = inp.length > 0
     ? `<span>${inp}</span><span class="cursor"></span>`
     : `<span class="cursor"></span>`;
+
+  // Update bullet time meter segments
+  updateBtMeterUI();
 }
 
 function onPlayerHit(enemy) {
@@ -996,6 +1369,21 @@ function render() {
   drawPlayer();
   drawParticles();
   drawFloatingTexts();
+
+  // Bullet time active: canvas-level slow-motion tint
+  if (state.btActive) {
+    const progress = Math.max(0, (state.btEnd - Date.now()) / state.btDuration);
+    ctx.save();
+    ctx.fillStyle = `rgba(80, 0, 200, ${0.06 * progress})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // horizontal scan lines (intensify during BT)
+    ctx.strokeStyle = `rgba(191,0,255,${0.04 * progress})`;
+    ctx.lineWidth = 1;
+    for (let y = 0; y < canvas.height; y += 8) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+    ctx.restore();
+  }
 }
 
 // ─── GAME LOOP ─────────────────────────────────────────────────────────────────
@@ -1035,21 +1423,16 @@ function resumeGame() {
   lastTime = performance.now(); // prevent dt spike after pause
 }
 
-function goToMainMenu() {
-  state.playing = false;
-  state.paused = false;
-  if (animId) cancelAnimationFrame(animId);
-  pauseScreen.classList.add('hidden');
-  gameOverScreen.classList.add('hidden');
-  startScreen.classList.remove('hidden');
-  setMenuFocus('start', 0);
-  // restart bg loop
-  animId = requestAnimationFrame(bgLoop);
+function clearBossUI() {
+  document.getElementById('bossTint').classList.remove('active');
+  document.getElementById('bossWarning').classList.remove('visible');
 }
 
 function endGame() {
   state.playing = false;
   state.paused = false;
+  deactivateBulletTime();
+  clearBossUI();
   pauseScreen.classList.add('hidden');
   gameOverScreen.classList.remove('hidden');
   finalScore.textContent = state.score;
@@ -1057,6 +1440,19 @@ function endGame() {
   finalWpm.textContent = peakWpm;
   finalCombo.textContent = peakCombo;
   setMenuFocus('gameover', 0);
+}
+
+function goToMainMenu() {
+  state.playing = false;
+  state.paused = false;
+  if (animId) cancelAnimationFrame(animId);
+  deactivateBulletTime();
+  clearBossUI();
+  pauseScreen.classList.add('hidden');
+  gameOverScreen.classList.add('hidden');
+  startScreen.classList.remove('hidden');
+  setMenuFocus('start', 0);
+  animId = requestAnimationFrame(bgLoop);
 }
 
 // ─── MENU KEYBOARD NAVIGATION ──────────────────────────────────────────────────
@@ -1126,6 +1522,12 @@ document.addEventListener('keydown', e => {
   }
 
   // ── IN-GAME KEYS ─────────────────────────────────────────────
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    activateBulletTime();
+    return;
+  }
+
   if (e.key === 'Escape') {
     e.preventDefault();
     pauseGame();
@@ -1170,8 +1572,86 @@ function triggerMiss() {
   spawnFloatingText(state.player.x, state.player.y - 40, 'MISS!', '#ff006e');
 }
 
+// ─── BULLET TIME ───────────────────────────────────────────────────────────────
+const BT_SEGS = 5;
+
+function activateBulletTime() {
+  if (!state.btActive && state.btCharge >= 1.0) {
+    state.btActive  = true;
+    state.btCharge  = 0;
+    state.btKills   = 0;
+    state.timeScale = 0.25;
+    state.btEnd     = Date.now() + state.btDuration;
+    document.getElementById('btTint').classList.add('active');
+    document.getElementById('btActiveLabel').classList.add('visible');
+    spawnFloatingText(state.player.x, state.player.y - 50, '◈ BULLET TIME ◈', '#bf00ff');
+  }
+}
+
+function deactivateBulletTime() {
+  state.btActive  = false;
+  state.timeScale = 1.0;
+  document.getElementById('btTint').classList.remove('active');
+  document.getElementById('btActiveLabel').classList.remove('visible');
+}
+
+function updateBtMeterUI() {
+  const filled = state.btActive
+    ? 0  // draining — show empty while active
+    : Math.floor(state.btCharge * BT_SEGS);
+
+  // Animate BT drain bar while active
+  let activeProgress = 0;
+  if (state.btActive) {
+    activeProgress = Math.max(0, (state.btEnd - Date.now()) / state.btDuration);
+  }
+
+  for (let i = 0; i < BT_SEGS; i++) {
+    const seg = document.getElementById(`bts${i}`);
+    if (!seg) continue;
+    if (state.btActive) {
+      const threshold = i / BT_SEGS;
+      seg.classList.toggle('filled', activeProgress > threshold);
+    } else {
+      seg.classList.toggle('filled', i < filled);
+    }
+  }
+
+  const ready = state.btCharge >= 1.0 && !state.btActive;
+  document.getElementById('btReadyLabel').classList.toggle('visible', ready);
+}
+
 function destroyEnemy(enemy) {
-  wpmWordTimes.push(Date.now()); // record for WPM
+  wpmWordTimes.push(Date.now()); // real wall-clock time — WPM unaffected by timeScale
+
+  // Track kills for boss spawning
+  state.totalKills++;
+  state.killsSinceLastBoss++;
+
+  // Charge bullet time meter (bosses give 3x charge)
+  if (!state.btActive) {
+    const chargeGain = enemy.isBoss ? 3 : 1;
+    state.btKills += chargeGain;
+    state.btCharge = Math.min(1.0, state.btKills / state.btKillsNeeded);
+  }
+
+  // Boss-specific cleanup
+  if (enemy.isBoss) {
+    state.bossAlive = false;
+    document.getElementById('bossTint').classList.remove('active');
+    document.getElementById('bossWarning').classList.remove('visible');
+    spawnParticles(enemy.x, enemy.y, '#ff6600', 40);
+    spawnParticles(enemy.x, enemy.y, '#ffcc00', 25);
+    const bossPoints = enemy.word.length * 50 * state.combo;
+    state.score += bossPoints;
+    state.wordsTyped++;
+    state.combo = Math.min(state.combo + 3, 16);
+    if (state.combo > peakCombo) peakCombo = state.combo;
+    spawnFloatingText(enemy.x, enemy.y - 40, `⚡ BOSS DOWN! +${bossPoints}`, '#ffcc00');
+    state.enemies = state.enemies.filter(e => e.id !== enemy.id);
+    return;
+  }
+
   const points = enemy.word.length * 10 * state.combo;
   state.score += points;
   state.wordsTyped++;
@@ -1200,17 +1680,6 @@ document.querySelectorAll('.diff-btn').forEach(btn => {
     document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     difficulty = btn.dataset.diff;
-  });
-});
-
-// Hovering a nav-btn with mouse shifts keyboard focus to it
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('mouseenter', () => {
-    // figure out which group this btn belongs to
-    for (const [grp, ids] of Object.entries(MENU_GROUPS)) {
-      const idx = ids.indexOf(btn.id);
-      if (idx !== -1) { setMenuFocus(grp, idx); break; }
-    }
   });
 });
 
