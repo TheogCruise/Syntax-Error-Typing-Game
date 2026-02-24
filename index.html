@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BULLET-TIME TYPIST</title>
+<title>S¥NTAX €RROR</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 
@@ -608,7 +608,7 @@
 
 <!-- Start Screen -->
 <div class="overlay" id="startScreen">
-  <div class="glitch-title">BULLET-TIME<br>TYPIST</div>
+  <div class="glitch-title">S¥NTAX<br>€RROR</div>
   <div class="instructions">
     Type any enemy's word and press <span style="color:var(--neon-cyan)">ENTER</span> to destroy it<br>
     <span style="color:var(--neon-green)">BACKSPACE</span> to correct mistakes<br>
@@ -695,19 +695,19 @@ const WORDS_BOSS = [
 ];
 
 const DIFFICULTIES = {
-  easy:   { spawnInterval: 3500, maxEnemies: 7,  bossEveryNKills: 20 },
+  easy:   { spawnInterval: 5000, maxEnemies: 4,  bossEveryNKills: 25 },
   normal: { spawnInterval: 2400, maxEnemies: 10, bossEveryNKills: 15 },
   hard:   { spawnInterval: 1400, maxEnemies: 14, bossEveryNKills: 10 }
 };
 
 // Tier definitions: speed multipliers and size ranges
 const TIERS = {
-  short:  { speedMult: 1.6, sizeMin: 13, sizeMax: 17, rotMult: 2.0,
+  short:  { speedMult: 1.4, sizeMin: 13, sizeMax: 17, rotMult: 2.0,
             colors: [
               { stroke: '#00f5ff', glow: 'rgba(0,245,255,0.3)' },
               { stroke: '#39ff14', glow: 'rgba(57,255,20,0.3)' },
             ]},
-  medium: { speedMult: 1.0, sizeMin: 20, sizeMax: 28, rotMult: 1.0,
+  medium: { speedMult: 0.85, sizeMin: 20, sizeMax: 28, rotMult: 1.0,
             colors: [
               { stroke: '#ff006e', glow: 'rgba(255,0,110,0.4)' },
               { stroke: '#bf00ff', glow: 'rgba(191,0,255,0.4)' },
@@ -719,7 +719,7 @@ const TIERS = {
             ]},
 };
 
-const BASE_SPEED = 0.7; // pixels/ms at normal timeScale=1
+const BASE_SPEED_BY_DIFF = { easy: 0.38, normal: 0.62, hard: 0.95 };
 
 const SHAPES_SHORT  = ['triangle', 'diamond'];
 const SHAPES_MEDIUM = ['square', 'hexagon', 'diamond', 'triangle'];
@@ -756,6 +756,11 @@ const finalCombo  = document.getElementById('finalCombo');
 function resize() {
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
+  // Keep core centred — update player position if game is running
+  if (state.player) {
+    state.player.x = canvas.width / 2;
+    state.player.y = canvas.height / 2;
+  }
 }
 window.addEventListener('resize', resize);
 resize();
@@ -765,16 +770,14 @@ function rand(min, max) { return Math.random() * (max - min) + min; }
 function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
 function randItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-function spawnEdgePos() {
-  const side = randInt(0, 3);
-  const W = canvas.width, H = canvas.height;
-  const pad = 60;
-  switch(side) {
-    case 0: return { x: rand(0, W), y: -pad };
-    case 1: return { x: W + pad,   y: rand(0, H) };
-    case 2: return { x: rand(0, W), y: H + pad };
-    case 3: return { x: -pad,       y: rand(0, H) };
-  }
+const SPAWN_RADIUS = 420; // fixed distance from core — screen-size independent
+
+function spawnRingPos() {
+  const angle = rand(0, Math.PI * 2);
+  // Scatter position within a band: SPAWN_RADIUS ± 40px so spawns don't all sit on exact circle
+  const r = SPAWN_RADIUS + rand(-40, 40);
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, angle };
 }
 
 // ─── INIT / RESET ──────────────────────────────────────────────────────────────
@@ -784,6 +787,7 @@ function initState() {
     paused: false,
     player: { x: canvas.width / 2, y: canvas.height / 2, r: 22, hp: 100 },
     enemies: [],
+    portals: [],       // boss pre-spawn portals
     currentInput: '',
     score: 0,
     combo: 1,
@@ -802,6 +806,7 @@ function initState() {
     totalKills: 0,
     killsSinceLastBoss: 0,
     bossAlive: false,
+    bossPortalPending: false,
   };
   particles = [];
   floatingTexts = [];
@@ -827,7 +832,8 @@ function buildEnemy(pos, word, tier) {
   const cx = canvas.width / 2, cy = canvas.height / 2;
   const angle = Math.atan2(cy - pos.y, cx - pos.x);
   const td = TIERS[tier];
-  const speed = BASE_SPEED * td.speedMult;
+  const baseSpeed = BASE_SPEED_BY_DIFF[difficulty] || 0.62;
+  const speed = baseSpeed * td.speedMult;
   const color = randItem(td.colors);
   const shapes = tier === 'boss' ? SHAPES_BOSS : tier === 'short' ? SHAPES_SHORT : SHAPES_MEDIUM;
   const size = randInt(td.sizeMin, td.sizeMax);
@@ -846,6 +852,9 @@ function buildEnemy(pos, word, tier) {
     rotSpeed: rand(-0.025, 0.025) * td.rotMult,
     pulse: rand(0, Math.PI * 2),
     isBoss: tier === 'boss',
+    // spawn-in animation: 0 = just appeared, 1 = fully solid
+    spawnProgress: 0,
+    spawnDuration: tier === 'boss' ? 800 : 500,
   };
 }
 
@@ -857,26 +866,41 @@ function spawnEnemy() {
   if (nonBossCount >= cfg.maxEnemies) return;
 
   const { word, tier } = pickWordAndTier();
-  const pos = spawnEdgePos();
+  const pos = spawnRingPos();
   state.enemies.push(buildEnemy(pos, word, tier));
 }
 
-function spawnBoss() {
-  if (state.bossAlive) return;
-  const word = randItem(WORDS_BOSS);
-  const pos  = spawnEdgePos();
-  state.bossAlive = true;
-  state.killsSinceLastBoss = 0;
-  state.enemies.push(buildEnemy(pos, word, 'boss'));
+const PORTAL_WARN_DURATION = 3500; // ms portal lives before boss emerges
 
-  // Dramatic entry effects
-  spawnFloatingText(canvas.width / 2, canvas.height / 2 - 60, '⚠ BOSS ⚠', '#ff4400');
-  document.getElementById('bossTint').classList.add('active');
+function openBossPortal() {
+  if (state.bossAlive || state.bossPortalPending) return;
+  state.bossPortalPending = true;
+  state.killsSinceLastBoss = 0;
+
+  const pos = spawnRingPos();
+  const word = randItem(WORDS_BOSS);
+
+  state.portals.push({
+    x: pos.x, y: pos.y,
+    age: 0,                          // ms since portal opened
+    duration: PORTAL_WARN_DURATION,  // how long before boss emerges
+    word,                            // word boss will carry
+    bossSpawned: false,
+    closing: false,                  // true after boss exits portal
+    closeAge: 0,
+  });
+
+  // Show HUD warning immediately
   document.getElementById('bossWarning').classList.add('visible');
-  // Hide warning label after 3s
-  setTimeout(() => {
-    document.getElementById('bossWarning').classList.remove('visible');
-  }, 3000);
+  setTimeout(() => document.getElementById('bossWarning').classList.remove('visible'), 3000);
+}
+
+function spawnBossFromPortal(portal) {
+  if (state.bossAlive) return;
+  state.bossAlive = true;
+  state.enemies.push(buildEnemy({ x: portal.x, y: portal.y }, portal.word, 'boss'));
+  document.getElementById('bossTint').classList.add('active');
+  spawnFloatingText(canvas.width / 2, canvas.height / 2 - 60, '⚠ BOSS ⚠', '#ff4400');
 }
 // ─── PARTICLES ─────────────────────────────────────────────────────────────────
 function spawnParticles(x, y, color, count = 12) {
@@ -1035,6 +1059,9 @@ function drawShape(x, y, size, shape, rot) {
 function drawEnemies() {
   const t = Date.now() / 1000;
 
+  // Draw portals behind enemies
+  drawPortals();
+
   state.enemies.forEach(e => {
     const pulse = 0.7 + 0.3 * Math.sin(t * 3 + e.pulse);
 
@@ -1055,37 +1082,125 @@ function drawEnemies() {
       drawNormalEnemy(e, t, pulse, isHighlighted);
     }
 
-    drawWordLabel(e);
+    // Only draw label once spawn animation is past 30%
+    if (e.spawnProgress > 0.3) drawWordLabel(e);
+  });
+}
+
+function drawPortals() {
+  const t = Date.now() / 1000;
+  state.portals.forEach(portal => {
+    const age    = portal.closing ? portal.closeAge : portal.age;
+    const total  = portal.closing ? 600 : portal.duration;
+    const prog   = Math.min(age / total, 1); // 0→1 over duration
+
+    // Portal radius grows in, then shrinks on close
+    const maxR  = 55;
+    let   r;
+    if (portal.closing) {
+      r = maxR * (1 - prog);
+    } else {
+      // Ease-in over first 600ms, then hold at max
+      r = maxR * Math.min(age / 600, 1);
+    }
+    if (r < 1) return;
+
+    const urgency = portal.closing ? 0 : Math.min(portal.age / portal.duration, 1);
+    const spin    = t * (2 + urgency * 3);
+    const glow    = 20 + urgency * 40;
+
+    ctx.save();
+
+    // Outer electric ring
+    ctx.strokeStyle = `rgba(255,60,0,${0.5 + 0.5 * Math.sin(t * 6)})`;
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = '#ff3300';
+    ctx.shadowBlur = glow;
+    ctx.beginPath();
+    ctx.arc(portal.x, portal.y, r + 8, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Three spinning arcs inside
+    for (let i = 0; i < 3; i++) {
+      const a0 = spin + (i / 3) * Math.PI * 2;
+      ctx.strokeStyle = `rgba(255,${100 + i*40},0,0.85)`;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#ff6600';
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(portal.x, portal.y, r, a0, a0 + Math.PI * 0.6);
+      ctx.stroke();
+    }
+
+    // Filled vortex center — darker as urgency rises
+    const cGrad = ctx.createRadialGradient(portal.x, portal.y, 0, portal.x, portal.y, r);
+    cGrad.addColorStop(0, `rgba(80,0,0,${0.6 + urgency * 0.3})`);
+    cGrad.addColorStop(0.6, `rgba(200,30,0,${0.15 + urgency * 0.2})`);
+    cGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = cGrad;
+    ctx.beginPath();
+    ctx.arc(portal.x, portal.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Countdown tick marks around edge (only when not closing)
+    if (!portal.closing) {
+      const ticks = 12;
+      for (let i = 0; i < ticks; i++) {
+        const ang  = (i / ticks) * Math.PI * 2;
+        const filled = i < Math.floor(urgency * ticks);
+        ctx.strokeStyle = filled ? `rgba(255,180,0,0.9)` : `rgba(255,80,0,0.3)`;
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = filled ? 8 : 0;
+        ctx.shadowColor = '#ffaa00';
+        const r0 = r + 14, r1 = r + 20;
+        ctx.beginPath();
+        ctx.moveTo(portal.x + Math.cos(ang) * r0, portal.y + Math.sin(ang) * r0);
+        ctx.lineTo(portal.x + Math.cos(ang) * r1, portal.y + Math.sin(ang) * r1);
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
   });
 }
 
 function drawNormalEnemy(e, t, pulse, isHighlighted) {
+  // Spawn-in: scale up from 0, fade in
+  const sp = e.spawnProgress;
+  const scale = 0.1 + 0.9 * sp;
+  const alpha = sp;
+
   const glowIntensity = isHighlighted ? 30 : (e.tier === 'short' ? 8 : 14);
 
   ctx.save();
+  ctx.globalAlpha = alpha;
   ctx.shadowColor = e.color.stroke;
   ctx.shadowBlur = glowIntensity * pulse;
   ctx.strokeStyle = e.color.stroke;
   ctx.lineWidth = isHighlighted ? 2.5 : (e.tier === 'short' ? 1 : 1.5);
   ctx.fillStyle = e.color.glow;
-  drawShape(e.x, e.y, e.size, e.shape, e.rot);
+  drawShape(e.x, e.y, e.size * scale, e.shape, e.rot);
   ctx.fill();
   ctx.stroke();
   ctx.restore();
 
-  if (isHighlighted) {
+  if (isHighlighted && sp > 0.5) {
     ctx.save();
-    ctx.globalAlpha = 0.15 * pulse;
+    ctx.globalAlpha = 0.15 * pulse * sp;
     ctx.fillStyle = e.color.stroke;
-    drawShape(e.x, e.y, e.size, e.shape, e.rot);
+    drawShape(e.x, e.y, e.size * scale, e.shape, e.rot);
     ctx.fill();
     ctx.restore();
   }
 }
 
 function drawBossEnemy(e, t, pulse, isHighlighted) {
+  const sp = e.spawnProgress;
   const bPulse = 0.6 + 0.4 * Math.sin(t * 1.5 + e.pulse);
   const warnPulse = 0.5 + 0.5 * Math.sin(t * 4);
+
+  ctx.save();
+  ctx.globalAlpha = sp;
 
   // Outer danger ring
   ctx.save();
@@ -1098,7 +1213,7 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   ctx.stroke();
   ctx.restore();
 
-  // Second spinning ring (counter-rotate)
+  // Second spinning ring
   ctx.save();
   ctx.strokeStyle = `rgba(255,100,0,${0.3 * bPulse})`;
   ctx.lineWidth = 1;
@@ -1111,7 +1226,7 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   ctx.setLineDash([]);
   ctx.restore();
 
-  // Core body — filled heavily
+  // Core body
   ctx.save();
   ctx.shadowColor = '#ff4400';
   ctx.shadowBlur = 40 * bPulse;
@@ -1123,7 +1238,7 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   ctx.stroke();
   ctx.restore();
 
-  // Interior star / second layer (inner shape rotated)
+  // Inner layer
   ctx.save();
   ctx.strokeStyle = `rgba(255,180,0,${0.4 * bPulse})`;
   ctx.lineWidth = 1;
@@ -1133,7 +1248,7 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   ctx.stroke();
   ctx.restore();
 
-  // Warning chevrons pointing inward (3 rings)
+  // Warning chevrons
   if (warnPulse > 0.5) {
     const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
     ctx.save();
@@ -1151,6 +1266,8 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
     }
     ctx.restore();
   }
+
+  ctx.restore(); // globalAlpha
 }
 
 function drawWordLabel(e) {
@@ -1275,6 +1392,11 @@ function update(dt) {
 
   // ── Update enemies (scaled speed) ──
   state.enemies.forEach(e => {
+    // Tick spawn animation (not affected by timeScale — always real-time)
+    if (e.spawnProgress < 1) {
+      e.spawnProgress = Math.min(1, e.spawnProgress + dt / e.spawnDuration);
+    }
+
     e.x += e.vx * state.timeScale;
     e.y += e.vy * state.timeScale;
     e.rot += e.rotSpeed * state.timeScale;
@@ -1282,7 +1404,6 @@ function update(dt) {
     const dist = Math.hypot(e.x - state.player.x, e.y - state.player.y);
     if (dist < state.player.r + e.size * 0.7) {
       if (e.isBoss) {
-        // Boss touch = instant death
         state.player.hp = 0;
       } else {
         onPlayerHit(e);
@@ -1290,13 +1411,31 @@ function update(dt) {
     }
   });
 
-  // ── Boss spawn check ──
+  // ── Portal update ──
+  state.portals = state.portals.filter(portal => {
+    if (portal.closing) {
+      portal.closeAge += dt;
+      return portal.closeAge < 600; // remove after close animation
+    }
+    portal.age += dt;
+    // Spawn boss when portal matures
+    if (!portal.bossSpawned && portal.age >= portal.duration) {
+      portal.bossSpawned = true;
+      spawnBossFromPortal(portal);
+      portal.closing = true;
+      portal.closeAge = 0;
+    }
+    return true;
+  });
+
+  // ── Boss spawn check (open portal) ──
   const cfg = DIFFICULTIES[difficulty];
-  if (!state.bossAlive && state.killsSinceLastBoss >= cfg.bossEveryNKills) {
-    spawnBoss();
+  if (!state.bossAlive && !state.bossPortalPending &&
+      state.killsSinceLastBoss >= cfg.bossEveryNKills) {
+    openBossPortal();
   }
 
-  // ── Sync bossTint with boss presence ──
+  // ── Sync bossTint ──
   const bossTintEl = document.getElementById('bossTint');
   if (state.bossAlive) {
     bossTintEl.classList.add('active');
@@ -1426,6 +1565,8 @@ function resumeGame() {
 function clearBossUI() {
   document.getElementById('bossTint').classList.remove('active');
   document.getElementById('bossWarning').classList.remove('visible');
+  if (state.portals) state.portals = [];
+  if (state) { state.bossPortalPending = false; state.bossAlive = false; }
 }
 
 function endGame() {
@@ -1638,6 +1779,7 @@ function destroyEnemy(enemy) {
   // Boss-specific cleanup
   if (enemy.isBoss) {
     state.bossAlive = false;
+    state.bossPortalPending = false;
     document.getElementById('bossTint').classList.remove('active');
     document.getElementById('bossWarning').classList.remove('visible');
     spawnParticles(enemy.x, enemy.y, '#ff6600', 40);
