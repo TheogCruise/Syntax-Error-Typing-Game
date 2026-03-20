@@ -38,7 +38,6 @@
     top: 0; left: 0;
   }
 
-  /* Scanline overlay */
   body::after {
     content: '';
     position: fixed;
@@ -54,7 +53,6 @@
     z-index: 100;
   }
 
-  /* CRT vignette */
   body::before {
     content: '';
     position: fixed;
@@ -75,11 +73,7 @@
     z-index: 10;
   }
 
-  .stat-block {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+  .stat-block { display: flex; flex-direction: column; gap: 4px; }
 
   .stat-label {
     font-family: 'Orbitron', monospace;
@@ -156,7 +150,6 @@
     white-space: nowrap;
   }
 
-  /* Blinking cursor */
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   .cursor {
     display: inline-block;
@@ -169,7 +162,6 @@
     animation: blink 0.8s step-end infinite;
   }
 
-  /* Miss flash overlay */
   #missAlert {
     position: absolute;
     top: 50%;
@@ -188,7 +180,6 @@
   }
   #missAlert.visible { opacity: 1; }
 
-  /* OVERLAY SCREENS */
   .overlay {
     position: absolute;
     inset: 0;
@@ -198,7 +189,7 @@
     justify-content: center;
     z-index: 50;
     background: rgba(2,4,8,0.9);
-    pointer-events: none; /* mouse fully disabled — keyboard only */
+    pointer-events: none;
   }
 
   .overlay.hidden { display: none; }
@@ -253,12 +244,14 @@
     transform: scale(1.05);
   }
 
+  /* ── CHANGE 1: added margin-top: 30px to push instructions below title ── */
   .instructions {
     font-family: 'Share Tech Mono', monospace;
     font-size: 13px;
     color: rgba(0,245,255,0.6);
     text-align: center;
     line-height: 2;
+    margin-top: 30px;
     margin-bottom: 40px;
     max-width: 480px;
     border: 1px solid rgba(0,245,255,0.2);
@@ -282,26 +275,14 @@
 
   #gameOverScreen .glitch-title { color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink), 0 0 60px var(--neon-pink); }
 
-  .final-stats {
-    display: flex;
-    gap: 40px;
-    margin: 30px 0;
-  }
-
-  .final-stat {
-    text-align: center;
-  }
-
+  .final-stats { display: flex; gap: 40px; margin: 30px 0; }
+  .final-stat { text-align: center; }
   .final-stat .stat-label { font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 3px; color: rgba(0,245,255,0.5); margin-bottom: 6px; }
   .final-stat .stat-value { font-family: 'Orbitron', monospace; font-size: 32px; font-weight: 900; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
 
   .diff-btn.active { box-shadow: inset 0 0 10px rgba(0,245,255,0.1); }
 
-  .difficulty-selector {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 30px;
-  }
+  .difficulty-selector { display: flex; gap: 12px; margin-bottom: 30px; }
 
   .diff-btn {
     font-family: 'Orbitron', monospace;
@@ -324,7 +305,6 @@
     text-shadow: 0 0 8px var(--neon-cyan);
   }
 
-  /* ── KEYBOARD FOCUS STYLES ── */
   .cyber-btn { cursor: none; pointer-events: none; }
 
   .nav-btn {
@@ -382,7 +362,6 @@
 
   .nav-btn.danger.kb-focus::before { border-color: var(--neon-pink); }
 
-  /* ── PAUSE SCREEN ── */
   #pauseScreen {
     background: rgba(2,4,8,0.82);
     backdrop-filter: blur(3px);
@@ -421,7 +400,6 @@
 
   button:focus { outline: none; }
 
-  /* ── BULLET TIME METER ── */
   #btMeter {
     position: absolute;
     right: 28px;
@@ -445,11 +423,7 @@
     transform: rotate(180deg);
   }
 
-  #btSegments {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 5px;
-  }
+  #btSegments { display: flex; flex-direction: column-reverse; gap: 5px; }
 
   .bt-seg {
     width: 22px;
@@ -485,7 +459,6 @@
     50%       { text-shadow: 0 0 20px #bf00ff, 0 0 40px #bf00ff; opacity: 0.7; }
   }
 
-  /* Bullet Time active screen tint — drawn via canvas, but also a CSS vignette */
   #btTint {
     position: absolute;
     inset: 0;
@@ -523,7 +496,6 @@
   }
   #btActiveLabel.visible { opacity: 1; }
 
-  /* ── BOSS PRESENCE EFFECTS ── */
   #bossTint {
     position: absolute;
     inset: 0;
@@ -563,7 +535,6 @@
 
 <canvas id="gameCanvas"></canvas>
 
-<!-- UI HUD -->
 <div id="ui">
   <div class="stat-block" id="scoreDisplay">
     <div class="stat-label">Score</div>
@@ -587,7 +558,6 @@
   <div id="healthTrack"><div id="healthFill"></div></div>
 </div>
 
-<!-- Bullet Time Meter -->
 <div id="btMeter">
   <div id="btReadyLabel">TAB<br>READY</div>
   <div id="btSegments">
@@ -600,7 +570,6 @@
   <div id="btLabel">BULLET TIME</div>
 </div>
 
-<!-- Bullet Time screen effects -->
 <div id="btTint"></div>
 <div id="btActiveLabel">◈ BULLET TIME ◈</div>
 <div id="bossTint"></div>
@@ -629,7 +598,6 @@
 <!-- Pause Screen -->
 <div class="overlay hidden" id="pauseScreen">
   <div class="glitch-title">PAUSED</div>
-  <div class="sub-title">// SYSTEM SUSPENDED //</div>
   <div class="btn-row">
     <button class="nav-btn" id="resumeBtn">RESUME</button>
     <button class="nav-btn danger" id="pauseMenuBtn">MAIN MENU</button>
@@ -667,7 +635,6 @@
 </div>
 
 <script>
-// ─── CONSTANTS & CONFIG ────────────────────────────────────────────────────────
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -700,7 +667,6 @@ const DIFFICULTIES = {
   hard:   { spawnInterval: 1400, maxEnemies: 14, bossEveryNKills: 10 }
 };
 
-// Tier definitions: speed multipliers and size ranges
 const TIERS = {
   short:  { speedMult: 1.4, sizeMin: 13, sizeMax: 17, rotMult: 2.0,
             colors: [
@@ -720,12 +686,10 @@ const TIERS = {
 };
 
 const BASE_SPEED_BY_DIFF = { easy: 0.38, normal: 0.62, hard: 0.95 };
-
 const SHAPES_SHORT  = ['triangle', 'diamond'];
 const SHAPES_MEDIUM = ['square', 'hexagon', 'diamond', 'triangle'];
 const SHAPES_BOSS   = ['star8', 'octagon'];
 
-// ─── STATE ─────────────────────────────────────────────────────────────────────
 let state = {};
 let animId;
 let difficulty = 'easy';
@@ -734,11 +698,10 @@ let lastTime = 0;
 let particles = [];
 let floatingTexts = [];
 let gridOffset = 0;
-let wpmWordTimes = []; // timestamps of each destroyed word
+let wpmWordTimes = [];
 let peakWpm = 0;
 let peakCombo = 0;
 
-// ─── DOM REFS ──────────────────────────────────────────────────────────────────
 const scoreVal    = document.getElementById('scoreVal');
 const wpmVal      = document.getElementById('wpmVal');
 const comboVal    = document.getElementById('comboVal');
@@ -752,11 +715,9 @@ const finalWords  = document.getElementById('finalWords');
 const finalWpm    = document.getElementById('finalWpm');
 const finalCombo  = document.getElementById('finalCombo');
 
-// ─── RESIZE ────────────────────────────────────────────────────────────────────
 function resize() {
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
-  // Keep core centred — update player position if game is running
   if (state.player) {
     state.player.x = canvas.width / 2;
     state.player.y = canvas.height / 2;
@@ -765,36 +726,32 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// ─── UTILITY ───────────────────────────────────────────────────────────────────
 function rand(min, max) { return Math.random() * (max - min) + min; }
 function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
 function randItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-const SPAWN_RADIUS = 420; // fixed distance from core — screen-size independent
+const SPAWN_RADIUS = 420;
 
 function spawnRingPos() {
   const angle = rand(0, Math.PI * 2);
-  // Scatter position within a band: SPAWN_RADIUS ± 40px so spawns don't all sit on exact circle
   const r = SPAWN_RADIUS + rand(-40, 40);
   const cx = canvas.width / 2, cy = canvas.height / 2;
   return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, angle };
 }
 
-// ─── INIT / RESET ──────────────────────────────────────────────────────────────
 function initState() {
   state = {
     playing: false,
     paused: false,
     player: { x: canvas.width / 2, y: canvas.height / 2, r: 22, hp: 100 },
     enemies: [],
-    portals: [],       // boss pre-spawn portals
+    portals: [],
     currentInput: '',
     score: 0,
     combo: 1,
     wordsTyped: 0,
     missFlash: false,
     missEnd: 0,
-    // Bullet Time
     btCharge: 0,
     btActive: false,
     btEnd: 0,
@@ -802,7 +759,6 @@ function initState() {
     btKillsNeeded: 10,
     btKills: 0,
     timeScale: 1.0,
-    // Boss
     totalKills: 0,
     killsSinceLastBoss: 0,
     bossAlive: false,
@@ -817,8 +773,6 @@ function initState() {
 }
 
 function pickWordAndTier() {
-  // Boss words are only spawned via spawnBoss
-  // Weighted random: 40% short, 60% medium on easy; more medium on hard
   const shortChance = difficulty === 'easy' ? 0.55 : difficulty === 'normal' ? 0.40 : 0.30;
   const r = Math.random();
   if (r < shortChance) {
@@ -844,53 +798,44 @@ function buildEnemy(pos, word, tier) {
     vx: Math.cos(angle) * speed,
     vy: Math.sin(angle) * speed,
     shape: randItem(shapes),
-    color,
-    word,
-    size,
-    tier,
+    color, word, size, tier,
     rot: 0,
     rotSpeed: rand(-0.025, 0.025) * td.rotMult,
     pulse: rand(0, Math.PI * 2),
     isBoss: tier === 'boss',
-    // spawn-in animation: 0 = just appeared, 1 = fully solid
     spawnProgress: 0,
     spawnDuration: tier === 'boss' ? 800 : 500,
   };
 }
 
-// ─── ENEMY ─────────────────────────────────────────────────────────────────────
 let enemyIdCounter = 0;
+
 function spawnEnemy() {
   const cfg = DIFFICULTIES[difficulty];
   const nonBossCount = state.enemies.filter(e => !e.isBoss).length;
   if (nonBossCount >= cfg.maxEnemies) return;
-
   const { word, tier } = pickWordAndTier();
   const pos = spawnRingPos();
   state.enemies.push(buildEnemy(pos, word, tier));
 }
 
-const PORTAL_WARN_DURATION = 3500; // ms portal lives before boss emerges
+const PORTAL_WARN_DURATION = 3500;
 
 function openBossPortal() {
   if (state.bossAlive || state.bossPortalPending) return;
   state.bossPortalPending = true;
   state.killsSinceLastBoss = 0;
-
   const pos = spawnRingPos();
   const word = randItem(WORDS_BOSS);
-
   state.portals.push({
     x: pos.x, y: pos.y,
-    age: 0,                          // ms since portal opened
-    duration: PORTAL_WARN_DURATION,  // how long before boss emerges
-    word,                            // word boss will carry
+    age: 0,
+    duration: PORTAL_WARN_DURATION,
+    word,
     bossSpawned: false,
-    closing: false,                  // true after boss exits portal
+    closing: false,
     closeAge: 0,
   });
-
-  // Show HUD warning immediately
   document.getElementById('bossWarning').classList.add('visible');
   setTimeout(() => document.getElementById('bossWarning').classList.remove('visible'), 3000);
 }
@@ -902,7 +847,7 @@ function spawnBossFromPortal(portal) {
   document.getElementById('bossTint').classList.add('active');
   spawnFloatingText(canvas.width / 2, canvas.height / 2 - 60, '⚠ BOSS ⚠', '#ff4400');
 }
-// ─── PARTICLES ─────────────────────────────────────────────────────────────────
+
 function spawnParticles(x, y, color, count = 12) {
   for (let i = 0; i < count; i++) {
     const angle = rand(0, Math.PI * 2);
@@ -923,21 +868,16 @@ function spawnFloatingText(x, y, text, color) {
   floatingTexts.push({ x, y, text, color, life: 1, decay: 0.025, vy: -1.5 });
 }
 
-// ─── DRAWING ───────────────────────────────────────────────────────────────────
 function drawGrid() {
   const W = canvas.width, H = canvas.height;
   gridOffset = (gridOffset + 0.3) % 60;
-
-  // Boss presence: shift grid to blood-red
   const hasBoss = state.playing && state.bossAlive;
   const gridColor = hasBoss
     ? `rgba(255,40,0,${0.045 + 0.02 * Math.sin(Date.now() / 300)})`
     : 'rgba(0,245,255,0.035)';
-
   ctx.save();
   ctx.strokeStyle = gridColor;
   ctx.lineWidth = 1;
-
   for (let x = gridOffset; x < W; x += 60) {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
   }
@@ -971,7 +911,7 @@ function drawPlayer() {
   ctx.fillStyle = grad;
   ctx.fill();
 
-  // Core body
+  // Core body — no inner cross
   ctx.save();
   ctx.shadowColor = '#00f5ff';
   ctx.shadowBlur = 20;
@@ -979,15 +919,6 @@ function drawPlayer() {
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Inner cross
-  ctx.strokeStyle = 'rgba(0,245,255,0.5)';
-  ctx.lineWidth = 1;
-  const crossSize = r * 0.5;
-  ctx.beginPath();
-  ctx.moveTo(x - crossSize, y); ctx.lineTo(x + crossSize, y);
-  ctx.moveTo(x, y - crossSize); ctx.lineTo(x, y + crossSize);
   ctx.stroke();
   ctx.restore();
 
@@ -1042,7 +973,6 @@ function drawShape(x, y, size, shape, rot) {
     }
     ctx.closePath();
   } else if (shape === 'star8') {
-    // 8-pointed star: alternate outer/inner radii
     const inner = size * 0.45;
     for (let i = 0; i < 16; i++) {
       const a = (i / 16) * Math.PI * 2 - Math.PI / 2;
@@ -1058,14 +988,9 @@ function drawShape(x, y, size, shape, rot) {
 
 function drawEnemies() {
   const t = Date.now() / 1000;
-
-  // Draw portals behind enemies
   drawPortals();
-
   state.enemies.forEach(e => {
     const pulse = 0.7 + 0.3 * Math.sin(t * 3 + e.pulse);
-
-    // Prefix match check
     const inp = state.currentInput.toLowerCase();
     let matchLen = 0;
     if (inp.length > 0) {
@@ -1075,14 +1000,11 @@ function drawEnemies() {
       }
     }
     const isHighlighted = matchLen > 0 && matchLen === inp.length;
-
     if (e.isBoss) {
       drawBossEnemy(e, t, pulse, isHighlighted);
     } else {
       drawNormalEnemy(e, t, pulse, isHighlighted);
     }
-
-    // Only draw label once spawn animation is past 30%
     if (e.spawnProgress > 0.3) drawWordLabel(e);
   });
 }
@@ -1092,26 +1014,19 @@ function drawPortals() {
   state.portals.forEach(portal => {
     const age    = portal.closing ? portal.closeAge : portal.age;
     const total  = portal.closing ? 600 : portal.duration;
-    const prog   = Math.min(age / total, 1); // 0→1 over duration
-
-    // Portal radius grows in, then shrinks on close
+    const prog   = Math.min(age / total, 1);
     const maxR  = 55;
     let   r;
     if (portal.closing) {
       r = maxR * (1 - prog);
     } else {
-      // Ease-in over first 600ms, then hold at max
       r = maxR * Math.min(age / 600, 1);
     }
     if (r < 1) return;
-
     const urgency = portal.closing ? 0 : Math.min(portal.age / portal.duration, 1);
     const spin    = t * (2 + urgency * 3);
     const glow    = 20 + urgency * 40;
-
     ctx.save();
-
-    // Outer electric ring
     ctx.strokeStyle = `rgba(255,60,0,${0.5 + 0.5 * Math.sin(t * 6)})`;
     ctx.lineWidth = 2.5;
     ctx.shadowColor = '#ff3300';
@@ -1119,8 +1034,6 @@ function drawPortals() {
     ctx.beginPath();
     ctx.arc(portal.x, portal.y, r + 8, 0, Math.PI * 2);
     ctx.stroke();
-
-    // Three spinning arcs inside
     for (let i = 0; i < 3; i++) {
       const a0 = spin + (i / 3) * Math.PI * 2;
       ctx.strokeStyle = `rgba(255,${100 + i*40},0,0.85)`;
@@ -1131,8 +1044,6 @@ function drawPortals() {
       ctx.arc(portal.x, portal.y, r, a0, a0 + Math.PI * 0.6);
       ctx.stroke();
     }
-
-    // Filled vortex center — darker as urgency rises
     const cGrad = ctx.createRadialGradient(portal.x, portal.y, 0, portal.x, portal.y, r);
     cGrad.addColorStop(0, `rgba(80,0,0,${0.6 + urgency * 0.3})`);
     cGrad.addColorStop(0.6, `rgba(200,30,0,${0.15 + urgency * 0.2})`);
@@ -1141,8 +1052,6 @@ function drawPortals() {
     ctx.beginPath();
     ctx.arc(portal.x, portal.y, r, 0, Math.PI * 2);
     ctx.fill();
-
-    // Countdown tick marks around edge (only when not closing)
     if (!portal.closing) {
       const ticks = 12;
       for (let i = 0; i < ticks; i++) {
@@ -1159,19 +1068,15 @@ function drawPortals() {
         ctx.stroke();
       }
     }
-
     ctx.restore();
   });
 }
 
 function drawNormalEnemy(e, t, pulse, isHighlighted) {
-  // Spawn-in: scale up from 0, fade in
   const sp = e.spawnProgress;
   const scale = 0.1 + 0.9 * sp;
   const alpha = sp;
-
   const glowIntensity = isHighlighted ? 30 : (e.tier === 'short' ? 8 : 14);
-
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.shadowColor = e.color.stroke;
@@ -1183,7 +1088,6 @@ function drawNormalEnemy(e, t, pulse, isHighlighted) {
   ctx.fill();
   ctx.stroke();
   ctx.restore();
-
   if (isHighlighted && sp > 0.5) {
     ctx.save();
     ctx.globalAlpha = 0.15 * pulse * sp;
@@ -1198,11 +1102,8 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   const sp = e.spawnProgress;
   const bPulse = 0.6 + 0.4 * Math.sin(t * 1.5 + e.pulse);
   const warnPulse = 0.5 + 0.5 * Math.sin(t * 4);
-
   ctx.save();
   ctx.globalAlpha = sp;
-
-  // Outer danger ring
   ctx.save();
   ctx.strokeStyle = `rgba(255,40,0,${0.18 * bPulse})`;
   ctx.lineWidth = 2;
@@ -1212,8 +1113,6 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   ctx.arc(e.x, e.y, e.size + 20 + Math.sin(t * 2) * 4, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
-
-  // Second spinning ring
   ctx.save();
   ctx.strokeStyle = `rgba(255,100,0,${0.3 * bPulse})`;
   ctx.lineWidth = 1;
@@ -1225,8 +1124,6 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   ctx.stroke();
   ctx.setLineDash([]);
   ctx.restore();
-
-  // Core body
   ctx.save();
   ctx.shadowColor = '#ff4400';
   ctx.shadowBlur = 40 * bPulse;
@@ -1237,8 +1134,6 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   ctx.fill();
   ctx.stroke();
   ctx.restore();
-
-  // Inner layer
   ctx.save();
   ctx.strokeStyle = `rgba(255,180,0,${0.4 * bPulse})`;
   ctx.lineWidth = 1;
@@ -1247,8 +1142,6 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
   drawShape(e.x, e.y, e.size * 0.55, e.shape === 'star8' ? 'octagon' : 'star8', -e.rot);
   ctx.stroke();
   ctx.restore();
-
-  // Warning chevrons
   if (warnPulse > 0.5) {
     const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
     ctx.save();
@@ -1266,15 +1159,13 @@ function drawBossEnemy(e, t, pulse, isHighlighted) {
     }
     ctx.restore();
   }
-
-  ctx.restore(); // globalAlpha
+  ctx.restore();
 }
 
 function drawWordLabel(e) {
   const word  = e.word;
   const input = state.currentInput.toLowerCase();
   const isBoss = e.isBoss;
-
   let matchLen = 0;
   if (input.length > 0) {
     for (let i = 0; i < Math.min(input.length, word.length); i++) {
@@ -1283,7 +1174,6 @@ function drawWordLabel(e) {
     }
   }
   const isPrefix = matchLen > 0 && matchLen === input.length;
-
   ctx.save();
   const fontSize = isBoss ? 15 : 13;
   ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
@@ -1293,8 +1183,6 @@ function drawWordLabel(e) {
   const bh = isBoss ? 26 : 22;
   const bx = e.x - bw / 2;
   const by = e.y - e.size - bh - (isBoss ? 16 : 10);
-
-  // Background
   ctx.fillStyle = isBoss ? 'rgba(40,8,0,0.92)' : 'rgba(2,4,8,0.85)';
   const baseColor  = isBoss ? '#ff6600' : (isPrefix ? '#ffff00' : e.color.stroke);
   ctx.strokeStyle  = baseColor;
@@ -1303,8 +1191,6 @@ function drawWordLabel(e) {
   ctx.shadowBlur   = isBoss ? 14 : (isPrefix ? 10 : 4);
   ctx.fillRect(bx, by, bw, bh);
   ctx.strokeRect(bx, by, bw, bh);
-
-  // Boss label tab above the word box
   if (isBoss) {
     ctx.font = `bold 9px 'Orbitron', monospace`;
     const labelW = ctx.measureText('⚠ BOSS ⚠').width + 8;
@@ -1316,18 +1202,13 @@ function drawWordLabel(e) {
     ctx.fillText('⚠ BOSS ⚠', e.x - labelW/2 + 4, by - 5);
     ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
   }
-
-  // Matched prefix fill
   if (matchLen > 0) {
     const matchTextW = ctx.measureText(word.slice(0, matchLen)).width;
     ctx.fillStyle = 'rgba(57,255,20,0.18)';
     ctx.fillRect(bx, by, matchTextW + padding, bh);
   }
-
-  // Letters
   let tx = bx + padding;
   const ty = by + bh / 2 + (isBoss ? 6 : 5);
-
   for (let i = 0; i < word.length; i++) {
     if (i < matchLen) {
       ctx.fillStyle = '#39ff14';
@@ -1341,7 +1222,6 @@ function drawWordLabel(e) {
     ctx.fillText(word[i], tx, ty);
     tx += ctx.measureText(word[i]).width;
   }
-
   ctx.restore();
 }
 
@@ -1371,54 +1251,36 @@ function drawFloatingTexts() {
   });
 }
 
-// ─── UPDATE ────────────────────────────────────────────────────────────────────
 function update(dt) {
   if (!state.playing || state.paused) return;
-
-  // ── Bullet Time drain (uses real wall-clock time, not scaled) ──
   if (state.btActive) {
-    if (Date.now() > state.btEnd) {
-      deactivateBulletTime();
-    }
+    if (Date.now() > state.btEnd) deactivateBulletTime();
   }
-
-  // ── Apply timeScale to spawn timer ──
   spawnTimer -= dt * state.timeScale;
   if (spawnTimer <= 0) {
     spawnEnemy();
     const base = DIFFICULTIES[difficulty].spawnInterval;
     spawnTimer = Math.max(800, base - state.score * 0.3);
   }
-
-  // ── Update enemies (scaled speed) ──
   state.enemies.forEach(e => {
-    // Tick spawn animation (not affected by timeScale — always real-time)
     if (e.spawnProgress < 1) {
       e.spawnProgress = Math.min(1, e.spawnProgress + dt / e.spawnDuration);
     }
-
     e.x += e.vx * state.timeScale;
     e.y += e.vy * state.timeScale;
     e.rot += e.rotSpeed * state.timeScale;
-
     const dist = Math.hypot(e.x - state.player.x, e.y - state.player.y);
     if (dist < state.player.r + e.size * 0.7) {
-      if (e.isBoss) {
-        state.player.hp = 0;
-      } else {
-        onPlayerHit(e);
-      }
+      if (e.isBoss) state.player.hp = 0;
+      else onPlayerHit(e);
     }
   });
-
-  // ── Portal update ──
   state.portals = state.portals.filter(portal => {
     if (portal.closing) {
       portal.closeAge += dt;
-      return portal.closeAge < 600; // remove after close animation
+      return portal.closeAge < 600;
     }
     portal.age += dt;
-    // Spawn boss when portal matures
     if (!portal.bossSpawned && portal.age >= portal.duration) {
       portal.bossSpawned = true;
       spawnBossFromPortal(portal);
@@ -1427,63 +1289,40 @@ function update(dt) {
     }
     return true;
   });
-
-  // ── Boss spawn check (open portal) ──
   const cfg = DIFFICULTIES[difficulty];
   if (!state.bossAlive && !state.bossPortalPending &&
       state.killsSinceLastBoss >= cfg.bossEveryNKills) {
     openBossPortal();
   }
-
-  // ── Sync bossTint ──
   const bossTintEl = document.getElementById('bossTint');
-  if (state.bossAlive) {
-    bossTintEl.classList.add('active');
-  } else {
-    bossTintEl.classList.remove('active');
-  }
-
-  // Miss flash
+  if (state.bossAlive) bossTintEl.classList.add('active');
+  else bossTintEl.classList.remove('active');
   const missAlert = document.getElementById('missAlert');
   if (state.missFlash && Date.now() > state.missEnd) {
     state.missFlash = false;
     missAlert.classList.remove('visible');
   }
-
-  // Particles (always full speed — visual only)
   particles.forEach(p => {
     p.x += p.vx; p.y += p.vy;
     p.vx *= 0.94; p.vy *= 0.94;
     p.life -= p.decay;
   });
   particles = particles.filter(p => p.life > 0);
-
-  floatingTexts.forEach(ft => {
-    ft.y += ft.vy;
-    ft.life -= ft.decay;
-  });
+  floatingTexts.forEach(ft => { ft.y += ft.vy; ft.life -= ft.decay; });
   floatingTexts = floatingTexts.filter(ft => ft.life > 0);
-
-  // WPM — uses real wall-clock timestamps, unaffected by timeScale
   const now = Date.now();
   wpmWordTimes = wpmWordTimes.filter(t => now - t < 30000);
   const wpm = Math.round(wpmWordTimes.length * 2);
   if (wpm > peakWpm) peakWpm = wpm;
   wpmVal.textContent = wpm;
-
-  // Update HUD
   scoreVal.textContent = state.score;
   comboVal.textContent = `x${state.combo}`;
   healthFill.style.width = state.player.hp + '%';
   if (state.player.hp <= 0) endGame();
-
-  // Type display
   const inp = state.currentInput;
   typeDisplay.innerHTML = inp.length > 0
     ? `<span>${inp}</span><span class="cursor"></span>`
     : `<span class="cursor"></span>`;
-
-  // Update bullet time meter segments
   updateBtMeterUI();
 }
 
@@ -1495,27 +1334,21 @@ function onPlayerHit(enemy) {
   state.combo = 1;
 }
 
-// ─── RENDER ────────────────────────────────────────────────────────────────────
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#020408';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   drawGrid();
-
   if (!state.playing) return;
-
   drawEnemies();
   drawPlayer();
   drawParticles();
   drawFloatingTexts();
-
-  // Bullet time active: canvas-level slow-motion tint
   if (state.btActive) {
     const progress = Math.max(0, (state.btEnd - Date.now()) / state.btDuration);
     ctx.save();
     ctx.fillStyle = `rgba(80, 0, 200, ${0.06 * progress})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // horizontal scan lines (intensify during BT)
     ctx.strokeStyle = `rgba(191,0,255,${0.04 * progress})`;
     ctx.lineWidth = 1;
     for (let y = 0; y < canvas.height; y += 8) {
@@ -1525,7 +1358,6 @@ function render() {
   }
 }
 
-// ─── GAME LOOP ─────────────────────────────────────────────────────────────────
 function loop(ts) {
   const dt = ts - lastTime;
   lastTime = ts;
@@ -1534,7 +1366,6 @@ function loop(ts) {
   animId = requestAnimationFrame(loop);
 }
 
-// ─── GAME FLOW ─────────────────────────────────────────────────────────────────
 function startGame() {
   initState();
   state.playing = true;
@@ -1559,7 +1390,7 @@ function resumeGame() {
   if (!state.paused) return;
   state.paused = false;
   pauseScreen.classList.add('hidden');
-  lastTime = performance.now(); // prevent dt spike after pause
+  lastTime = performance.now();
 }
 
 function clearBossUI() {
@@ -1596,8 +1427,6 @@ function goToMainMenu() {
   animId = requestAnimationFrame(bgLoop);
 }
 
-// ─── MENU KEYBOARD NAVIGATION ──────────────────────────────────────────────────
-// Groups map: name → ordered array of button IDs
 const MENU_GROUPS = {
   start:    ['startBtn'],
   pause:    ['resumeBtn', 'pauseMenuBtn'],
@@ -1608,7 +1437,6 @@ let activeGroup = 'start';
 let focusIndex  = 0;
 
 function setMenuFocus(group, idx) {
-  // Clear previous focus
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('kb-focus'));
   activeGroup = group;
   focusIndex  = idx;
@@ -1632,20 +1460,14 @@ function menuSelect() {
   if (el) el.click();
 }
 
-// ─── INPUT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-  // ── MENU / OVERLAY KEYS ──────────────────────────────────────
   const onOverlay = !state.playing || state.paused;
-
   if (onOverlay) {
     e.preventDefault();
     if (e.key === 'ArrowUp')   { menuNav(-1); return; }
     if (e.key === 'ArrowDown') { menuNav(1);  return; }
     if (e.key === 'Enter')     { menuSelect(); return; }
-
-    // On start screen: left/right change difficulty
     if (!state.playing && !state.paused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
       const diffs = ['easy', 'normal', 'hard'];
       const cur   = diffs.indexOf(difficulty);
@@ -1656,40 +1478,14 @@ document.addEventListener('keydown', e => {
       });
       return;
     }
-
-    // Escape on pause → resume
     if (state.paused && e.key === 'Escape') { resumeGame(); return; }
     return;
   }
-
-  // ── IN-GAME KEYS ─────────────────────────────────────────────
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    activateBulletTime();
-    return;
-  }
-
-  if (e.key === 'Escape') {
-    e.preventDefault();
-    pauseGame();
-    return;
-  }
-
-  if (e.key === 'Backspace') {
-    e.preventDefault();
-    state.currentInput = state.currentInput.slice(0, -1);
-    return;
-  }
-
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    submitWord();
-    return;
-  }
-
-  if (e.key.length === 1) {
-    state.currentInput += e.key.toLowerCase();
-  }
+  if (e.key === 'Tab') { e.preventDefault(); activateBulletTime(); return; }
+  if (e.key === 'Escape') { e.preventDefault(); pauseGame(); return; }
+  if (e.key === 'Backspace') { e.preventDefault(); state.currentInput = state.currentInput.slice(0, -1); return; }
+  if (e.key === 'Enter') { e.preventDefault(); submitWord(); return; }
+  if (e.key.length === 1) state.currentInput += e.key.toLowerCase();
 });
 
 function submitWord() {
@@ -1697,23 +1493,19 @@ function submitWord() {
   state.currentInput = '';
   if (!typed) return;
   const match = state.enemies.find(e => e.word === typed);
-  if (match) {
-    destroyEnemy(match);
-  } else {
-    triggerMiss();
-  }
+  if (match) destroyEnemy(match);
+  else triggerMiss();
 }
 
 function triggerMiss() {
   state.missFlash = true;
   state.missEnd = Date.now() + 500;
-  state.combo = Math.max(1, state.combo - 1);
+  state.combo = 1;
   const missAlert = document.getElementById('missAlert');
   missAlert.classList.add('visible');
   spawnFloatingText(state.player.x, state.player.y - 40, 'MISS!', '#ff006e');
 }
 
-// ─── BULLET TIME ───────────────────────────────────────────────────────────────
 const BT_SEGS = 5;
 
 function activateBulletTime() {
@@ -1737,16 +1529,9 @@ function deactivateBulletTime() {
 }
 
 function updateBtMeterUI() {
-  const filled = state.btActive
-    ? 0  // draining — show empty while active
-    : Math.floor(state.btCharge * BT_SEGS);
-
-  // Animate BT drain bar while active
+  const filled = state.btActive ? 0 : Math.floor(state.btCharge * BT_SEGS);
   let activeProgress = 0;
-  if (state.btActive) {
-    activeProgress = Math.max(0, (state.btEnd - Date.now()) / state.btDuration);
-  }
-
+  if (state.btActive) activeProgress = Math.max(0, (state.btEnd - Date.now()) / state.btDuration);
   for (let i = 0; i < BT_SEGS; i++) {
     const seg = document.getElementById(`bts${i}`);
     if (!seg) continue;
@@ -1757,26 +1542,19 @@ function updateBtMeterUI() {
       seg.classList.toggle('filled', i < filled);
     }
   }
-
   const ready = state.btCharge >= 1.0 && !state.btActive;
   document.getElementById('btReadyLabel').classList.toggle('visible', ready);
 }
 
 function destroyEnemy(enemy) {
-  wpmWordTimes.push(Date.now()); // real wall-clock time — WPM unaffected by timeScale
-
-  // Track kills for boss spawning
+  wpmWordTimes.push(Date.now());
   state.totalKills++;
   state.killsSinceLastBoss++;
-
-  // Charge bullet time meter (bosses give 3x charge)
   if (!state.btActive) {
     const chargeGain = enemy.isBoss ? 3 : 1;
     state.btKills += chargeGain;
     state.btCharge = Math.min(1.0, state.btKills / state.btKillsNeeded);
   }
-
-  // Boss-specific cleanup
   if (enemy.isBoss) {
     state.bossAlive = false;
     state.bossPortalPending = false;
@@ -1793,24 +1571,17 @@ function destroyEnemy(enemy) {
     state.enemies = state.enemies.filter(e => e.id !== enemy.id);
     return;
   }
-
   const points = enemy.word.length * 10 * state.combo;
   state.score += points;
   state.wordsTyped++;
   state.combo = Math.min(state.combo + 1, 16);
   if (state.combo > peakCombo) peakCombo = state.combo;
-
   spawnParticles(enemy.x, enemy.y, enemy.color.stroke, 18);
   spawnFloatingText(enemy.x, enemy.y - 30, `+${points}`, '#39ff14');
-
-  if (state.combo > 2) {
-    spawnFloatingText(enemy.x, enemy.y - 55, `x${state.combo} COMBO!`, '#ffff00');
-  }
-
+  if (state.combo > 2) spawnFloatingText(enemy.x, enemy.y - 55, `x${state.combo} COMBO!`, '#ffff00');
   state.enemies = state.enemies.filter(e => e.id !== enemy.id);
 }
 
-// ─── BUTTON CLICK EVENTS ───────────────────────────────────────────────────────
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('resumeBtn').addEventListener('click', resumeGame);
 document.getElementById('pauseMenuBtn').addEventListener('click', goToMainMenu);
@@ -1825,7 +1596,6 @@ document.querySelectorAll('.diff-btn').forEach(btn => {
   });
 });
 
-// ─── BOOT ──────────────────────────────────────────────────────────────────────
 setMenuFocus('start', 0);
 
 (function bootRender() {
@@ -1834,14 +1604,12 @@ setMenuFocus('start', 0);
   drawGrid();
 })();
 
-// Continuous background grid animation on start/pause screens
 function bgLoop(ts) {
   if (!state.playing || state.paused) {
     ctx.fillStyle = '#020408';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     gridOffset = (gridOffset + 0.3) % 60;
     drawGrid();
-    // Draw frozen game state behind pause overlay
     if (state.paused) {
       drawEnemies();
       drawPlayer();
